@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentMentor.Domain.Models.ViewModels;
 using StudentMentor.Domain.Models.ViewModels.Account;
@@ -22,13 +23,9 @@ namespace StudentMentor.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost(nameof(RegisterStudent))]
-        public ActionResult<string> RegisterStudent(RegistrationModel model)
+        public async Task<ActionResult<string>> RegisterStudent(RegistrationModel model)
         {
-            var checkMailResponse = _userRepository.CheckEmail(model.Email);
-            if (checkMailResponse.IsError)
-                return BadRequest(checkMailResponse.Message);
-
-            var registerStudentResult = _studentRepository.RegisterStudent(model);
+            var registerStudentResult = await _studentRepository.RegisterStudent(model);
             if (registerStudentResult.IsError)
                 return BadRequest(registerStudentResult.Message);
 
@@ -38,9 +35,9 @@ namespace StudentMentor.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost(nameof(Login))]
-        public ActionResult<string> Login(LoginModel model)
+        public async Task<ActionResult<string>> Login(LoginModel model)
         {
-            var result = _userRepository.GetUserIfValidCredentials(model);
+            var result = await _userRepository.GetUserIfValidCredentials(model);
             if (result.IsError)
                 return BadRequest(result.Message);
 
@@ -50,9 +47,9 @@ namespace StudentMentor.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult<UserModel> GetCurrentUserModel()
+        public async Task<ActionResult<UserModel>> GetCurrentUserModel()
         {
-            var user = _userRepository.GetCurrentUserModel();
+            var user = await _userRepository.GetCurrentUserModel();
             if (user == null)
                 return Unauthorized();
 
@@ -61,9 +58,9 @@ namespace StudentMentor.Web.Controllers
 
         [AllowAnonymous]
         [HttpGet(nameof(RefreshToken))]
-        public ActionResult<string> RefreshToken([FromQuery] string token)
+        public async Task<ActionResult<string>> RefreshToken([FromQuery] string token)
         {
-            var newToken = _jwtService.GetNewToken(token);
+            var newToken = await _jwtService.GetNewToken(token);
 
             return Ok(newToken);
         }

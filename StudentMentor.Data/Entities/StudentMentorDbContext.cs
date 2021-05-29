@@ -18,30 +18,7 @@ namespace StudentMentor.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
-                .HasDiscriminator(u => u.UserRole)
-                .HasValue<Student>(UserRole.Student)
-                .HasValue<Mentor>(UserRole.Mentor)
-                .HasValue<Admin>(UserRole.Admin);
-
-            modelBuilder.Entity<Student>()
-                .HasOne(s => s.Mentor)
-                .WithMany(m => m.Students)
-                .HasForeignKey(s => s.MentorId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.UserFrom)
-                .WithMany(u => u.MessagesSent)
-                .HasForeignKey(m => m.UserFromId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.UserTo)
-                .WithMany(u => u.MessagesReceived)
-                .HasForeignKey(m => m.UserToId)
-                .OnDelete(DeleteBehavior.NoAction);
-
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentMentorDbContext).Assembly);
             base.OnModelCreating(modelBuilder);
         }
     }

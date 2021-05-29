@@ -1,25 +1,14 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using StudentMentor.Data.Entities;
-using StudentMentor.Data.Enums;
-using StudentMentor.Domain.Models.Configurations;
-using StudentMentor.Domain.Repositories.Implementations;
-using StudentMentor.Domain.Repositories.Interfaces;
-using StudentMentor.Domain.Services.Implementations;
-using StudentMentor.Domain.Services.Interfaces;
-using StudentMentor.Web.Infrastructure;
-using StudentMentor.Web.Infrastructure.AuthorizationRequirements;
+using StudentMentor.Web.Infrastructure.Extensions;
+using StudentMentor.Web.Infrastructure.Filters;
 
 namespace StudentMentor.Web
 {
@@ -35,45 +24,28 @@ namespace StudentMentor.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
             services.AddHttpContextAccessor();
+            services.AddControllersWithViews();
 
-            services.AddDbContext<StudentMentorDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StudentMentor")));
+            services
+                .AddConfigurations(Configuration)
+                .AddDatabase(Configuration)
+                .AddAuthentication(Configuration)
+                .AddAuthorizationPolicies()
+                .AddHandlers()
+                .AddRepositories()
+                .AddServices()
+                .AddMapper()
+                .AddValidations();
 
-            var jwtConfiguration = new JwtConfiguration();
-            Configuration.GetSection(nameof(JwtConfiguration)).Bind(jwtConfiguration);
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.AddControllers(options =>
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = jwtConfiguration.Issuer,
-                        ValidateAudience = true,
-                        ValidAudience = jwtConfiguration.AudienceId,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(jwtConfiguration.GetAudienceSecretBytes())
-                    };
-                });
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(Policies.Admin, policy => policy.Requirements.Add(new RoleRequirement(UserRole.Admin)));
-                options.AddPolicy(Policies.Mentor, policy => policy.Requirements.Add(new RoleRequirement(UserRole.Mentor)));
-                options.AddPolicy(Policies.Student, policy => policy.Requirements.Add(new RoleRequirement(UserRole.Student)));
-            });
-
-            services.AddSingleton<IAuthorizationHandler, RoleRequirementHandler>();
-
-            services.Configure<JwtConfiguration>(Configuration.GetSection(nameof(JwtConfiguration)));
-
-            services.AddTransient<IClaimProvider, ClaimProvider>();
-            services.AddTransient<IJwtService, JwtService>();
-
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IStudentRepository, StudentRepository>();
-
-            services.AddControllers()
+                    options.Filters.Add<ValidationFilterAttribute>();
+                })
+                .AddFluentValidation(options =>
+                {
+                    options.DisableDataAnnotationsValidation = true;
+                })
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();

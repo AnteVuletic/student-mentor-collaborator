@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using Jose;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -46,7 +47,7 @@ namespace StudentMentor.Domain.Services.Implementations
             return JWT.Encode(payload, _jwtConfiguration.GetAudienceSecretBytes(), Algorithm);
         }
 
-        public string GetNewToken(string token)
+        public async Task<string> GetNewToken(string token)
         {
             var decodedToken = JWT.Decode(token, _jwtConfiguration.GetAudienceSecretBytes());
             var decodedJObjectToken = (JObject)JsonConvert.DeserializeObject(decodedToken);
@@ -56,7 +57,7 @@ namespace StudentMentor.Domain.Services.Implementations
 
             var userId = decodedJObjectToken[Claims.UserId].ToObject<int>();
 
-            var user = _userRepository.GetUser(userId);
+            var user = await _userRepository.GetUser(userId);
             return GetJwtTokenForUser(user);
         }
     }

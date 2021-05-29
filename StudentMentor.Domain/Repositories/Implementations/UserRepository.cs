@@ -1,4 +1,9 @@
 ﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using StudentMentor.Data.Entities;
 using StudentMentor.Data.Entities.Models;
 using StudentMentor.Domain.Abstractions;
@@ -14,25 +19,25 @@ namespace StudentMentor.Domain.Repositories.Implementations
     {
         private readonly StudentMentorDbContext _dbContext;
         private readonly IClaimProvider _claimProvider;
+        private readonly IMapper _mapper;
 
-        public UserRepository(StudentMentorDbContext dbContext, IClaimProvider claimProvider)
+        public UserRepository(StudentMentorDbContext dbContext, IClaimProvider claimProvider, IMapper mapper)
         {
             _dbContext = dbContext;
             _claimProvider = claimProvider;
+            _mapper = mapper;
         }
 
-        public ResponseResult CheckEmail(string email)
+        public async Task<bool> IsEmailTaken(string email, CancellationToken token)
         {
-            var isEmailTaken = _dbContext.Users.Any(u => u.Email == email.ToLower().Trim());
+            var isEmailTaken = await _dbContext.Users.AnyAsync(u => u.Email == email.ToLower().Trim(), token);
 
-            return isEmailTaken
-                ? ResponseResult.Error($"{email} is already taken")
-                : ResponseResult.Ok;
+            return isEmailTaken;
         }
 
-        public ResponseResult<User> GetUserIfValidCredentials(LoginModel model)
+        public async Task<ResponseResult<User>> GetUserIfValidCredentials(LoginModel model)
         {
-            var user = _dbContext.Users.FirstOrDefault(u => u.Email == model.Email.ToLower().Trim());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == model.Email.ToLower().Trim());
             if (user is null)
                 return ResponseResult<User>.Error("Invalid password or email");
 
@@ -42,24 +47,18 @@ namespace StudentMentor.Domain.Repositories.Implementations
                 : ResponseResult<User>.Error("Invalid password or email");
         }
 
-        public User GetUser(int userId)
+        public async Task<User> GetUser(int userId)
         {
-            var user = _dbContext.Users.Find(userId);
+            var user = await _dbContext.Users.FindAsync(userId);
             return user;
         }
 
-        public UserModel GetCurrentUserModel()
+        public async Task<UserModel> GetCurrentUserModel()
         {
-            var user = _dbContext.Users
+            var user = await _dbContext.Users
                 .Where(u => u.Id == _claimProvider.GetUserId())
-                .Select(u => new UserModel
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName
-                })
-                .SingleOrDefault();
+                .ProjectTo<UserModel>(_mapper.ConfigurationProvider)
+                .SingleOrDefaultAsync();
 
             return user;
         }

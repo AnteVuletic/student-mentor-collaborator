@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentMentor.Domain.Models.ViewModels;
@@ -12,22 +13,24 @@ namespace StudentMentor.Web.Controllers
     {
         private readonly IStudentRepository _studentRepository;
 
+
         public AdminController(IStudentRepository studentRepository)
         {
             _studentRepository = studentRepository;
         }
 
         [HttpGet(nameof(GetStudents))]
-        public ActionResult<ICollection<StudentModel>> GetStudents()
+        public async Task<ActionResult<ICollection<StudentModel>>> GetStudents()
         {
-            var students = _studentRepository.GetStudents();
+            var students = await _studentRepository.GetStudents();
             return Ok(students);
         }
 
+
         [HttpDelete(nameof(DeleteStudent))]
-        public ActionResult DeleteStudent([FromQuery] int studentId)
+        public async Task<ActionResult> DeleteStudent([FromQuery] int studentId)
         {
-            var response = _studentRepository.DeleteStudent(studentId);
+            var response = await _studentRepository.DeleteStudent(studentId);
             if (response.IsError)
                 return BadRequest(response.Message);
 

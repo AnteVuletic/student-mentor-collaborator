@@ -18,11 +18,9 @@ export const parseJwt = (token) => {
   return JSON.parse(jsonPayload);
 };
 
-const token = localStorage.getItem("token");
-const tokenParsed = parseJwt(token);
 const initialState = {
-  role: tokenParsed?.role,
-  userId: tokenParsed?.userId,
+  role: null,
+  userId: null,
 };
 
 export const UserContext = React.createContext({
@@ -31,9 +29,11 @@ export const UserContext = React.createContext({
 });
 
 const UserProvider = ({ children }) => {
+  const token = localStorage.getItem("token");
+  const tokenParsed = parseJwt(token);
   const history = useHistory();
-  const [role, setRole] = useState(initialState.role);
-  const [userId, setUserId] = useState(initialState.userId);
+  const [role, setRole] = useState(tokenParsed?.role);
+  const [userId, setUserId] = useState(tokenParsed?.userId);
 
   const logOut = () => {
     localStorage.removeItem("token");
@@ -41,6 +41,10 @@ const UserProvider = ({ children }) => {
     setUserId(null);
     history.push("/login");
   };
+
+  if (token == null) {
+    this.logOut();
+  }
 
   const value = {
     state: { role, userId },
