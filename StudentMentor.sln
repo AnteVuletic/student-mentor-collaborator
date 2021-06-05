@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentMentor.Domain", "Stu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentMentor.Data", "StudentMentor.Data\StudentMentor.Data.csproj", "{2A8754DC-5B61-46F0-9E58-ED47030652BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentMentor.EmailTemplates", "StudentMentor.EmailTemplates\StudentMentor.EmailTemplates.csproj", "{BF28CEDF-B0B0-4BCB-A03F-A11E49B3EBA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2A8754DC-5B61-46F0-9E58-ED47030652BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A8754DC-5B61-46F0-9E58-ED47030652BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A8754DC-5B61-46F0-9E58-ED47030652BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF28CEDF-B0B0-4BCB-A03F-A11E49B3EBA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF28CEDF-B0B0-4BCB-A03F-A11E49B3EBA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF28CEDF-B0B0-4BCB-A03F-A11E49B3EBA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF28CEDF-B0B0-4BCB-A03F-A11E49B3EBA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,7 +15,9 @@ using StudentMentor.Domain.Repositories.Implementations;
 using StudentMentor.Domain.Repositories.Interfaces;
 using StudentMentor.Domain.Services.Implementations;
 using StudentMentor.Domain.Services.Interfaces;
+using StudentMentor.EmailTemplates;
 using StudentMentor.Web.Infrastructure.AuthorizationRequirements;
+using StudentMentor.Web.Infrastructure.Email;
 
 namespace StudentMentor.Web.Infrastructure.Extensions
 {
@@ -74,6 +76,11 @@ namespace StudentMentor.Web.Infrastructure.Extensions
         {
             services.AddTransient<IClaimProvider, ClaimProvider>();
             services.AddTransient<IJwtService, JwtService>();
+            services.AddTransient<IEmailSenderService, EmailSenderService>();
+            services.AddTransient<IWebHostService, WebHostService>();
+            services.AddTransient<EmailHandler>();
+
+            services.AddScoped<IRazorViewToStringRenderer, RazorViewToStringRenderer>();
 
             return services;
         }
@@ -81,6 +88,8 @@ namespace StudentMentor.Web.Infrastructure.Extensions
         public static IServiceCollection AddConfigurations(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<JwtConfiguration>(configuration.GetSection(nameof(JwtConfiguration)));
+            services.Configure<EmailConfiguration>(configuration.GetSection(nameof(EmailConfiguration)));
+
             return services;
         }
 
@@ -88,6 +97,8 @@ namespace StudentMentor.Web.Infrastructure.Extensions
         {
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IStudentRepository, StudentRepository>();
+            services.AddTransient<IMentorRepository, MentorRepository>();
+
             return services;
         }
 
@@ -100,6 +111,8 @@ namespace StudentMentor.Web.Infrastructure.Extensions
         public static IServiceCollection AddValidations(this IServiceCollection services)
         {
             services.AddTransient<IValidator<RegistrationModel>, RegistrationModelValidation>();
+            services.AddTransient<IValidator<MentorInviteModel>, MentorInviteModelValidation>();
+            services.AddTransient<IValidator<MentorRegistrationModel>, MentorRegistrationModelValidation>();
             return services;
         }
     }

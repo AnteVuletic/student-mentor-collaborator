@@ -28,11 +28,11 @@ namespace StudentMentor.Domain.Repositories.Implementations
             _mapper = mapper;
         }
 
-        public async Task<bool> IsEmailTaken(string email, CancellationToken token)
+        public async Task<bool> IsEmailAvailable(string email, CancellationToken token)
         {
-            var isEmailTaken = await _dbContext.Users.AnyAsync(u => u.Email == email.ToLower().Trim(), token);
+            var isEmailTaken = await _dbContext.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower().Trim(), token);
 
-            return isEmailTaken;
+            return !isEmailTaken;
         }
 
         public async Task<ResponseResult<User>> GetUserIfValidCredentials(LoginModel model)

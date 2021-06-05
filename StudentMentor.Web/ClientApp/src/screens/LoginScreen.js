@@ -6,15 +6,17 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
 import axios from "axios";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
+import ErrorPrinter from "../components/ErrorPrinter";
 import FormControlSpacing from "../components/styled/FormControlSpacing";
 import { parseJwt } from "../services/providers/UserProvider";
+import { useFullHeightStyles } from "../theme/main";
 
 const LoginScreen = () => {
+  const fullHeightStyles = useFullHeightStyles();
   const history = useHistory();
   const {
     handleSubmit,
@@ -42,73 +44,76 @@ const LoginScreen = () => {
     );
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Typography component="h1" variant="h5">
-        Log in
-      </Typography>
-      <form onSubmit={handleSubmit(handleLogin)}>
-        <FormControlSpacing fullWidth variant="outlined">
-          <Controller
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextField
-                onChange={onChange}
-                onBlur={onBlur}
-                value={value}
-                helperText={errors?.email ? errors.email.message : null}
-                error={!!errors.email}
-                id="email"
-                label="Email"
-                variant="outlined"
-              />
-            )}
-            control={control}
-            rules={{
-              required: "Required",
-              pattern: {
-                value: /^\S+@\S+\.\S+$/,
-                message: "Invalid email format",
-              },
-            }}
-          />
-        </FormControlSpacing>
-        <FormControlSpacing fullWidth variant="outlined">
-          <Controller
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextField
-                onChange={onChange}
-                onBlur={onBlur}
-                value={value}
-                helperText={errors?.password ? errors.password.message : null}
-                error={!!errors.password}
-                variant="outlined"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
-            )}
-            control={control}
-            rules={{
-              required: "Required",
-            }}
-          />
-        </FormControlSpacing>
-        <Box mt={2}></Box>
-        {backendMessage && <Alert severity="error">{backendMessage}</Alert>}
-        <Button type="submit" fullWidth variant="contained" color="primary">
+    <Grid container className={fullHeightStyles.fullHeight} alignItems="center">
+      <Container component="main" maxWidth="xs">
+        <Typography component="h1" variant="h5">
           Log in
-        </Button>
-        <Grid container>
-          <Grid item>
-            <Link to="/register" variant="body2">
-              Don't have an account? Register
-            </Link>
+        </Typography>
+        <form onSubmit={handleSubmit(handleLogin)}>
+          <FormControlSpacing fullWidth variant="outlined">
+            <Controller
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextField
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  helperText={errors?.email ? errors.email.message : null}
+                  error={!!errors.email}
+                  id="email"
+                  label="Email"
+                  variant="outlined"
+                />
+              )}
+              control={control}
+              rules={{
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Invalid email format",
+                },
+              }}
+            />
+          </FormControlSpacing>
+          <FormControlSpacing fullWidth variant="outlined">
+            <Controller
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextField
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  helperText={errors?.password ? errors.password.message : null}
+                  error={!!errors.password}
+                  variant="outlined"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                />
+              )}
+              control={control}
+              rules={{
+                required: "Password is required",
+              }}
+            />
+          </FormControlSpacing>
+          <Box mt={2} />
+          {backendMessage && <ErrorPrinter error={backendMessage} />}
+          <Button type="submit" fullWidth variant="contained" color="primary">
+            Log in
+          </Button>
+          <Box mt={2} />
+          <Grid container>
+            <Grid item>
+              <Link to="/register" variant="body2">
+                Don't have an account? Register
+              </Link>
+            </Grid>
           </Grid>
-        </Grid>
-      </form>
-    </Container>
+        </form>
+      </Container>
+    </Grid>
   );
 };
 

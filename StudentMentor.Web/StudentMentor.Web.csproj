@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\StudentMentor.Data\StudentMentor.Data.csproj" />
     <ProjectReference Include="..\StudentMentor.Domain\StudentMentor.Domain.csproj" />
+    <ProjectReference Include="..\StudentMentor.EmailTemplates\StudentMentor.EmailTemplates.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

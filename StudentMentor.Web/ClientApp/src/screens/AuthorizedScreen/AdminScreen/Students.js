@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
+  LinearProgress,
   Grid,
   IconButton,
   Table,
@@ -14,20 +15,24 @@ import {
 import { Delete } from "@material-ui/icons";
 
 const Students = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const fetchStudents = () => {
-    axios.get("api/Admin/GetStudents").then(({ data }) => {
+    setIsLoading(true);
+    axios.get("api/Student").then(({ data }) => {
       setStudents(data);
+      setIsLoading(false);
     });
   };
 
   useEffect(fetchStudents, []);
 
   const deleteStudent = (studentId) => {
-    axios
-      .delete(`api/Admin/DeleteStudent?studentId=${studentId}`)
-      .then(fetchStudents);
+    setIsLoading(true);
+    axios.delete(`api/Student/${studentId}`).then(fetchStudents);
   };
+
+  if (isLoading) return <LinearProgress />;
 
   if (students.length === 0) {
     return (

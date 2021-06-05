@@ -9,7 +9,7 @@ namespace StudentMentor.Domain.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<bool> IsEmailTaken(string email, CancellationToken token);
+        Task<bool> IsEmailAvailable(string email, CancellationToken token);
         Task<ResponseResult<User>> GetUserIfValidCredentials(LoginModel model);
         Task<User> GetUser(int userId);
         Task<UserModel> GetCurrentUserModel();

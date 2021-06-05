@@ -2,6 +2,7 @@
 using AutoMapper;
 using StudentMentor.Data.Entities.Models;
 using StudentMentor.Domain.Models.ViewModels;
+using StudentMentor.Domain.Models.ViewModels.Account;
 
 namespace StudentMentor.Domain.Mappings
 {
@@ -31,6 +32,8 @@ namespace StudentMentor.Domain.Mappings
                     FirstName = s.FirstName,
                     LastName = s.LastName
                 })));
+
+            CreateMap<MentorInviteModel, Mentor>();
         }
     }
 }

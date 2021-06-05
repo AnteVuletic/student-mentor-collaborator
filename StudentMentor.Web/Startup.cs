@@ -24,10 +24,8 @@ namespace StudentMentor.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpContextAccessor();
-            services.AddControllersWithViews();
-
             services
+                .AddHttpContextAccessor()
                 .AddConfigurations(Configuration)
                 .AddDatabase(Configuration)
                 .AddAuthentication(Configuration)
@@ -38,7 +36,9 @@ namespace StudentMentor.Web
                 .AddMapper()
                 .AddValidations();
 
-            services.AddControllers(options =>
+            services.AddRazorPages();
+            services
+                .AddControllers(options =>
                 {
                     options.Filters.Add<ValidationFilterAttribute>();
                 })
@@ -61,6 +61,12 @@ namespace StudentMentor.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(options => options
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin()
+            );
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
@@ -72,9 +78,7 @@ namespace StudentMentor.Web
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
 
             app.UseSpa(spa =>

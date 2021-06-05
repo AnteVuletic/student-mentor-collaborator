@@ -61,6 +61,15 @@ namespace StudentMentor.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to send email to: {0} with content: {1}.
+        /// </summary>
+        internal static string EmailExceptionLog {
+            get {
+                return ResourceManager.GetString("EmailExceptionLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email is taken.
         /// </summary>
         internal static string EmailTaken {
@@ -75,6 +84,15 @@ namespace StudentMentor.Domain.Resources {
         internal static string PasswordShort {
             get {
                 return ResourceManager.GetString("PasswordShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Passwords need to match.
+        /// </summary>
+        internal static string PasswordsMustMatch {
+            get {
+                return ResourceManager.GetString("PasswordsMustMatch", resourceCulture);
             }
         }
     }

@@ -3,7 +3,7 @@
   "name": "StudentMentor",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "/images/student-mentor.svg",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }

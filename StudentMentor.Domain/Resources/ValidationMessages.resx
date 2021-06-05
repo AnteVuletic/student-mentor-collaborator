@@ -117,10 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EmailExceptionLog" xml:space="preserve">
+    <value>Failed to send email to: {0} with content: {1}</value>
+  </data>
   <data name="EmailTaken" xml:space="preserve">
     <value>Email is taken</value>
   </data>
   <data name="PasswordShort" xml:space="preserve">
     <value>Password should be atleast {0} characters long</value>
+  </data>
+  <data name="PasswordsMustMatch" xml:space="preserve">
+    <value>Passwords need to match</value>
   </data>
 </root>

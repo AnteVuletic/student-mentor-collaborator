@@ -47,6 +47,26 @@ namespace StudentMentor.Domain.Services.Implementations
             return JWT.Encode(payload, _jwtConfiguration.GetAudienceSecretBytes(), Algorithm);
         }
 
+        public string GetTokenForEmailInvite(int userId)
+        {
+            var payload = new Dictionary<string, string>
+            {
+                {"iss", _jwtConfiguration.Issuer},
+                {"aud", _jwtConfiguration.AudienceId},
+                {Claims.UserId, userId.ToString()},
+            };
+
+            return JWT.Encode(payload, _jwtConfiguration.GetAudienceSecretBytes(), Algorithm);
+        }
+
+        public int GetUserIdFromEmailToken(string emailInviteToken)
+        {
+            var decodedToken = JWT.Decode(emailInviteToken, _jwtConfiguration.GetAudienceSecretBytes());
+            var decodedJObjectToken = (JObject)JsonConvert.DeserializeObject(decodedToken);
+            var userId = decodedJObjectToken[Claims.UserId].ToObject<int>();
+            return userId;
+        }
+
         public async Task<string> GetNewToken(string token)
         {
             var decodedToken = JWT.Decode(token, _jwtConfiguration.GetAudienceSecretBytes());
