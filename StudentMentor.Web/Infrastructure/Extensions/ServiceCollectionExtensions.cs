@@ -1,9 +1,12 @@
-﻿using FluentValidation;
+﻿using System.Threading.Tasks;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using StudentMentor.Data.Entities;
@@ -18,6 +21,7 @@ using StudentMentor.Domain.Services.Interfaces;
 using StudentMentor.EmailTemplates;
 using StudentMentor.Web.Infrastructure.AuthorizationRequirements;
 using StudentMentor.Web.Infrastructure.Email;
+using StudentMentor.Web.Infrastructure.Providers;
 
 namespace StudentMentor.Web.Infrastructure.Extensions
 {
@@ -49,6 +53,19 @@ namespace StudentMentor.Web.Infrastructure.Extensions
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(jwtConfiguration.GetAudienceSecretBytes())
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            if (!string.IsNullOrEmpty(accessToken))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             return services;
@@ -78,9 +95,11 @@ namespace StudentMentor.Web.Infrastructure.Extensions
             services.AddTransient<IJwtService, JwtService>();
             services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddTransient<IWebHostService, WebHostService>();
+            services.AddTransient<IGithubService, GithubService>();
             services.AddTransient<EmailHandler>();
 
             services.AddScoped<IRazorViewToStringRenderer, RazorViewToStringRenderer>();
+            services.Replace(ServiceDescriptor.Singleton<IUserIdProvider, MyUserProvider>());
 
             return services;
         }
@@ -89,6 +108,8 @@ namespace StudentMentor.Web.Infrastructure.Extensions
         {
             services.Configure<JwtConfiguration>(configuration.GetSection(nameof(JwtConfiguration)));
             services.Configure<EmailConfiguration>(configuration.GetSection(nameof(EmailConfiguration)));
+            services.Configure<GithubConfiguration>(configuration.GetSection(nameof(GithubConfiguration)));
+            services.Configure<HookConfiguration>(configuration.GetSection(nameof(HookConfiguration)));
 
             return services;
         }
@@ -98,6 +119,9 @@ namespace StudentMentor.Web.Infrastructure.Extensions
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IStudentRepository, StudentRepository>();
             services.AddTransient<IMentorRepository, MentorRepository>();
+            services.AddTransient<IMessageRepository, MessageRepository>();
+            services.AddTransient<IGithubRepository, GithubRepository>();
+            services.AddTransient<IFileRepository, FileRepository>();
 
             return services;
         }

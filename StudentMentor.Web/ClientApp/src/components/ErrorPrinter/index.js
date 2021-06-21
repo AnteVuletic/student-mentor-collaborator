@@ -2,7 +2,10 @@ import { Alert } from "@material-ui/lab";
 import React from "react";
 
 const ErrorPrinter = ({ error }) => {
-  const errorKeys = Object.keys(error.errors);
+  if (typeof error === "string" || error instanceof String)
+    return <Alert severity="error">{error}</Alert>;
+
+  const errorKeys = Object.keys(error?.errors);
   return (
     <>
       {errorKeys.map((key) => {

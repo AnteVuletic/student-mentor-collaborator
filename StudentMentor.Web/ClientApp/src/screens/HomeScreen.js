@@ -6,25 +6,29 @@ import {
   Grid,
   LinearProgress,
   Toolbar,
-  Typography,
+  Tooltip,
+  Box,
+  Avatar,
 } from "@material-ui/core";
+import { GridArrowUpwardIcon } from "@material-ui/data-grid";
 import { Person, PowerSettingsNew } from "@material-ui/icons";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { Route, Switch, useHistory } from "react-router";
+import { Route, Switch, useHistory, Link } from "react-router-dom";
 
 import AdminScreen from "./AuthorizedScreen/AdminScreen";
 import MentorScreen from "./AuthorizedScreen/MentorScreen";
 import StudentScreen from "./AuthorizedScreen/StudentScreen";
-
-import { useNavigationStyles } from "../theme/main";
-import { UserContext } from "../services/providers/UserProvider";
+import ProfileScreen from "./AuthorizedScreen/ProfileScreen";
 import SubscreenNavigation from "../components/SubscreenNavigation";
-import { MenuContext } from "../services/providers/MenuProvider";
 import ScrollTop from "../components/ScrollTop";
-import { GridArrowUpwardIcon } from "@material-ui/data-grid";
+
+import { UserContext } from "../services/providers/UserProvider";
+import { MenuContext } from "../services/providers/MenuProvider";
+import { useAvatarStyles, useNavigationStyles } from "../theme/main";
 
 const HomeScreen = (props) => {
+  const avatarStyle = useAvatarStyles();
   const {
     state: { navigationLinks, activeNavigationLink },
     setActiveNavigationLink,
@@ -54,9 +58,12 @@ const HomeScreen = (props) => {
         <Toolbar>
           <Grid container justify="space-between" alignItems="center">
             <Grid container item xs={2}>
-              <Typography variant="h5">
-                {userInfo.firstName} {userInfo.lastName}
-              </Typography>
+              <Tooltip title={`${userInfo.firstName} ${userInfo.lastName}`}>
+                <Avatar className={avatarStyle.avatarPrimary}>
+                  {userInfo.firstName?.charAt(0)}
+                  {userInfo.lastName?.charAt(0)}
+                </Avatar>
+              </Tooltip>
             </Grid>
             <Grid container item xs={7}>
               <SubscreenNavigation
@@ -68,13 +75,15 @@ const HomeScreen = (props) => {
             <Grid container item xs={3}>
               <Grid container justify="flex-end" spacing={1}>
                 <Grid item>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    startIcon={<Person />}
-                  >
-                    Profile
-                  </Button>
+                  <Link to="/home/profile">
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      startIcon={<Person />}
+                    >
+                      Profile
+                    </Button>
+                  </Link>
                 </Grid>
                 <Grid item>
                   <Button
@@ -103,13 +112,25 @@ const HomeScreen = (props) => {
           <Route path="/home/admin">
             <AdminScreen />
           </Route>
+          <Route path="/home/profile/:githubToken">
+            <ProfileScreen />
+          </Route>
+          <Route path="/home/profile">
+            <ProfileScreen />
+          </Route>
         </Switch>
-        <ScrollTop {...props}>
-          <Fab color="primary" size="small">
-            <GridArrowUpwardIcon />
-          </Fab>
-        </ScrollTop>
       </Container>
+      <ScrollTop {...props}>
+        <Box m={2}>
+          <Grid container justify="flex-end">
+            <Grid item>
+              <Fab color="primary" size="small">
+                <GridArrowUpwardIcon />
+              </Fab>
+            </Grid>
+          </Grid>
+        </Box>
+      </ScrollTop>
     </>
   );
 };

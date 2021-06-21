@@ -6,6 +6,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using StudentMentor.Data.Entities;
 using StudentMentor.Data.Entities.Models;
+using StudentMentor.Data.Enums;
 using StudentMentor.Domain.Abstractions;
 using StudentMentor.Domain.Helpers;
 using StudentMentor.Domain.Models.ViewModels;
@@ -41,6 +42,9 @@ namespace StudentMentor.Domain.Repositories.Implementations
             if (user is null)
                 return ResponseResult<User>.Error("Invalid password or email");
 
+            if (user.Password is null)
+                return ResponseResult<User>.Error("Please set your password using link sent to your email");
+
             var isValidPassword = EncryptionHelper.ValidatePassword(model.Password, user.Password);
             return isValidPassword
                 ? new ResponseResult<User>(user)
@@ -55,6 +59,18 @@ namespace StudentMentor.Domain.Repositories.Implementations
 
         public async Task<UserModel> GetCurrentUserModel()
         {
+            var role = _claimProvider.GetUserRole();
+
+            if (role == UserRole.Student)
+            {
+                var student = await _dbContext.Students
+                    .Where(u => u.Id == _claimProvider.GetUserId())
+                    .ProjectTo<StudentModel>(_mapper.ConfigurationProvider)
+                    .SingleOrDefaultAsync();
+
+                return student;
+            }
+
             var user = await _dbContext.Users
                 .Where(u => u.Id == _claimProvider.GetUserId())
                 .ProjectTo<UserModel>(_mapper.ConfigurationProvider)

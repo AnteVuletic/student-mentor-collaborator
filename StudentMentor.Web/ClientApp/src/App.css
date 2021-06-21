@@ -5,3 +5,8 @@ body {
 a {
   text-decoration: none;
 }
+
+#react-doc-viewer #header-bar,
+#react-doc-viewer #file-name {
+  display: none !important;
+}

@@ -22,7 +22,12 @@ namespace StudentMentor.Domain.Services.Implementations
             return $"{GetRootUrl()}/register/{token}";
         }
 
-        private string GetRootUrl()
+        public string GetGithubLoginRedirectUrl()
+        {
+            return $"{GetRootUrl()}/api/Account/AuthorizeGithub";
+        }
+
+        public string GetRootUrl()
         {
             return $"{_httpContextAccessor.HttpContext?.Request.Scheme}://{_httpContextAccessor.HttpContext?.Request.Host}{_httpContextAccessor.HttpContext?.Request.PathBase}";
         }

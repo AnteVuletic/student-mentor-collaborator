@@ -19,6 +19,15 @@ namespace StudentMentor.Data.Configurations
                 .WithMany(u => u.MessagesReceived)
                 .HasForeignKey(m => m.UserToId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(m => m.PushActivity)
+                .WithOne(pa => pa.Message)
+                .HasForeignKey<Message>(x => x.PushActivityId);
+
+            builder.HasOne(m => m.File)
+                .WithOne(f => f.Message)
+                .HasForeignKey<Message>(m => m.FileId)
+                .IsRequired(false);
         }
     }
 }

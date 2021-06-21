@@ -1,4 +1,5 @@
 ﻿using System;
+using StudentMentor.Data.Entities.Models.Github;
 
 namespace StudentMentor.Data.Entities.Models
 {
@@ -11,6 +12,12 @@ namespace StudentMentor.Data.Entities.Models
 
         public int? UserToId { get; set; }
         public User UserTo { get; set; }
+
+        public int? PushActivityId { get; set; }
+        public PushActivity PushActivity { get; set; }
+
+        public int? FileId { get; set; }
+        public File File { get; set; }
 
         public DateTime MessageCreatedAt { get; set; }
     }

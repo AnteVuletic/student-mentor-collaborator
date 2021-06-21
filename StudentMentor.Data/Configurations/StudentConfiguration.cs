@@ -13,6 +13,14 @@ namespace StudentMentor.Data.Configurations
                 .WithMany(m => m.Students)
                 .HasForeignKey(s => s.MentorId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasIndex(x => x.GithubAccessKey)
+                .IsUnique();
+
+            builder.HasOne(s => s.FinalsPaper)
+                .WithOne(fp => fp.Student)
+                .HasForeignKey<Student>(s => s.FinalsPaperId)
+                .IsRequired(false);
         }
     }
 }

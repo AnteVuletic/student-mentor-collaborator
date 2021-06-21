@@ -26,4 +26,13 @@ export const useFullHeightStyles = makeStyles((theme) => ({
   },
 }));
 
+export const useAvatarStyles = makeStyles((theme) => ({
+  avatarPrimary: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  avatarSecondary: {
+    backgroundColor: theme.palette.secondary.main,
+  },
+}));
+
 export default main;

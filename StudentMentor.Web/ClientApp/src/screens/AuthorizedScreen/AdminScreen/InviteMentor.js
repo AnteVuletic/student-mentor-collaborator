@@ -97,7 +97,7 @@ const InviteMentor = () => {
                 error={!!errors.firstName}
                 variant="outlined"
                 label="First name"
-                type="firstName"
+                type="text"
                 id="firstName"
               />
             )}
@@ -119,7 +119,7 @@ const InviteMentor = () => {
                 error={!!errors.lastName}
                 variant="outlined"
                 label="Last name"
-                type="lastName"
+                type="text"
                 id="lastName"
               />
             )}

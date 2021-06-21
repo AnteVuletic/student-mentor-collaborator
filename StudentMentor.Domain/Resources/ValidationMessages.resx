@@ -123,6 +123,9 @@
   <data name="EmailTaken" xml:space="preserve">
     <value>Email is taken</value>
   </data>
+  <data name="MessageNotFound" xml:space="preserve">
+    <value>The message you're trying to delete was not found</value>
+  </data>
   <data name="PasswordShort" xml:space="preserve">
     <value>Password should be atleast {0} characters long</value>
   </data>

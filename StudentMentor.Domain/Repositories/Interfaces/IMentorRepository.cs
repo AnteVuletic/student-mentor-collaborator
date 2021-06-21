@@ -14,5 +14,6 @@ namespace StudentMentor.Domain.Repositories.Interfaces
         Task<ResponseResult> DeleteMentor(int mentorId);
         Task<ResponseResult<Mentor>> SetMentorPassword(int mentorId, MentorRegistrationModel model);
         Task<ResponseResult<Mentor>> CreateMentor(MentorInviteModel model);
+        Task<MentorModel> GetStudentsMentor(int studentId);
     }
 }

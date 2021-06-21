@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using AutoMapper;
 using StudentMentor.Data.Entities.Models;
+using StudentMentor.Data.Entities.Models.Github;
+using StudentMentor.Data.Enums;
 using StudentMentor.Domain.Models.ViewModels;
 using StudentMentor.Domain.Models.ViewModels.Account;
 
@@ -10,7 +12,9 @@ namespace StudentMentor.Domain.Mappings
     {
         public ApplicationProfile()
         {
+            var baseUrl = "";
             CreateMap<User, UserModel>();
+
             CreateMap<Student, StudentModel>()
                 .IncludeBase<User, UserModel>()
                 .ForMember(src => src.Mentor, opts => opts.MapFrom(s => s.MentorId.HasValue
@@ -20,6 +24,14 @@ namespace StudentMentor.Domain.Mappings
                         Email = s.Mentor.Email,
                         FirstName = s.Mentor.FirstName,
                         LastName = s.Mentor.LastName
+                    }
+                    : null))
+                .ForMember(m => m.FinalsPaper, opts => opts.MapFrom(x => x.FinalsPaperId.HasValue
+                    ? new FileModel
+                    {
+                        FileName = x.FinalsPaper.FileName,
+                        Url = @$"{baseUrl}\{x.FinalsPaper.FilePath}",
+                        Id = x.FinalsPaper.Id
                     }
                     : null));
 
@@ -34,6 +46,71 @@ namespace StudentMentor.Domain.Mappings
                 })));
 
             CreateMap<MentorInviteModel, Mentor>();
+            CreateMap<Message, MessageModel>()
+                .ForMember(m => m.UserFrom,
+                    opts => opts.MapFrom(src => new UserModel
+                    {
+                        Id = src.UserFrom.Id,
+                        Email = src.UserFrom.Email,
+                        FirstName = src.UserFrom.FirstName,
+                        LastName = src.UserFrom.LastName
+                    }))
+                .ForMember(m => m.UserTo,
+                    opts => opts.MapFrom(src => new UserModel
+                    {
+                        Id = src.UserTo.Id,
+                        Email = src.UserTo.Email,
+                        FirstName = src.UserTo.FirstName,
+                        LastName = src.UserTo.LastName
+                    }))
+                .ForMember(m => m.RepositoryName, src => src.MapFrom(x => x.PushActivity.RepositoryName))
+                .ForMember(m => m.Commits, src => src.MapFrom(x => x.PushActivity.Commits.Select(c =>
+                    new GithubMessageCommitModel
+                    {
+                        Id = c.Id,
+                        Message = c.Message,
+                        TimeStamp = c.TimeStamp,
+                        Url = c.Url,
+                        FileLogs = c.FileLogs.Select(fl => new GithubMessageFileLogModel
+                        {
+                            Id = fl.Id,
+                            ChangeType = fl.ChangeType,
+                            File = fl.File
+                        }).ToList()
+                    })))
+                .ForMember(m => m.File, src => src.MapFrom(x => x.FileId.HasValue
+                    ? new FileModel
+                    {
+                        FileName = x.File.FileName,
+                        Url = @$"{baseUrl}\{x.File.FilePath}",
+                        Id = x.File.Id,
+                    }
+                    : null));
+            CreateMap<MessageModel, Message>();
+            CreateMap<Student, FileModel>()
+                .ForMember(f => f.Id, src => src.MapFrom(x => x.FinalsPaperId))
+                .ForMember(f => f.FileName, src => src.MapFrom(x => x.FinalsPaper.FileName))
+                .ForMember(f => f.Url, src => src.MapFrom(x => @$"{baseUrl}\{x.FinalsPaper.FilePath}"));
+
+            CreateMap<SendMessageModel, Message>();
+
+            CreateMap<PushModel, PushActivity>()
+                .ForMember(m => m.RepositoryId, src => src.MapFrom(x => x.Repository.Id))
+                .ForMember(m => m.RepositoryName, src => src.MapFrom(x => x.Repository.Name))
+                .ForMember(m => m.Commits, src => src.MapFrom(x =>
+                    x.Commits.Select(c => new Data.Entities.Models.Github.Commit
+                    {
+                        Id = c.Id,
+                        Message = c.Message,
+                        TimeStamp = c.TimeStamp,
+                        Url = c.Url,
+                        FileLogs = c
+                            .Added.Select(a => new FileLog { ChangeType = FileChangeType.Added, File = a })
+                            .Union(c.Modified.Select(m => new FileLog { ChangeType = FileChangeType.Changed, File = m }))
+                            .Union(c.Removed.Select(r => new FileLog { ChangeType = FileChangeType.Deleted, File = r }))
+                            .ToList()
+                    }
+                )));
         }
     }
 }

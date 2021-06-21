@@ -4,5 +4,7 @@
     {
         string GetWebIconUrl();
         string GetRegistrationUrl(string token);
+        string GetGithubLoginRedirectUrl();
+        public string GetRootUrl();
     }
 }

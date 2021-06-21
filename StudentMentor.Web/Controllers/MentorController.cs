@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using StudentMentor.Domain.Models.ViewModels.Account;
 using StudentMentor.Domain.Repositories.Interfaces;
 using StudentMentor.Domain.Services.Interfaces;
@@ -15,12 +14,18 @@ namespace StudentMentor.Web.Controllers
         private readonly IMentorRepository _mentorRepository;
         private readonly IJwtService _jwtService;
         private readonly EmailHandler _emailSender;
+        private readonly IClaimProvider _claimProvider;
 
-        public MentorController(IMentorRepository mentorRepository, IJwtService jwtService, EmailHandler emailSender)
-        {
+        public MentorController(
+            IMentorRepository mentorRepository,
+            IJwtService jwtService,
+            EmailHandler emailSender,
+            IClaimProvider claimProvider
+        ) {
             _mentorRepository = mentorRepository;
             _jwtService = jwtService;
             _emailSender = emailSender;
+            _claimProvider = claimProvider;
         }
 
         [Authorize(Policy = Policies.Admin)]
@@ -55,6 +60,15 @@ namespace StudentMentor.Web.Controllers
             await _emailSender.SendMentorInviteEmail(mentorResponse.Data, token);
 
             return Ok();
+        }
+
+        [Authorize(Policy = Policies.Student)]
+        [HttpGet(nameof(GetMentor))]
+        public async Task<ActionResult> GetMentor()
+        {
+            var mentorModel = await _mentorRepository.GetStudentsMentor(_claimProvider.GetUserId());
+
+            return Ok(mentorModel);
         }
 
         [AllowAnonymous]

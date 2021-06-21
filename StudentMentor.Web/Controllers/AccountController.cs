@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentMentor.Domain.Models.ViewModels;
 using StudentMentor.Domain.Models.ViewModels.Account;
 using StudentMentor.Domain.Repositories.Interfaces;
 using StudentMentor.Domain.Services.Interfaces;
+using StudentMentor.Web.Infrastructure;
 
 namespace StudentMentor.Web.Controllers
 {
@@ -13,12 +15,18 @@ namespace StudentMentor.Web.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IStudentRepository _studentRepository;
         private readonly IJwtService _jwtService;
+        private readonly IGithubService _githubService;
 
-        public AccountController(IUserRepository userRepository, IStudentRepository studentRepository, IJwtService jwtService)
-        {
+        public AccountController(
+            IUserRepository userRepository,
+            IStudentRepository studentRepository,
+            IJwtService jwtService,
+            IGithubService githubService
+        ) {
             _userRepository = userRepository;
             _studentRepository = studentRepository;
             _jwtService = jwtService;
+            _githubService = githubService;
         }
 
         [AllowAnonymous]
@@ -44,6 +52,20 @@ namespace StudentMentor.Web.Controllers
             var user = result.Data;
             var token = _jwtService.GetJwtTokenForUser(user);
             return Ok(token);
+        }
+
+        [Authorize(Policy = Policies.Student)]
+        [HttpGet(nameof(GetGithubAuthLink))]
+        public ActionResult<string> GetGithubAuthLink()
+        {
+            return _githubService.GetOAuthLink();
+        }
+            
+        [AllowAnonymous]
+        [HttpGet(nameof(AuthorizeGithub))]
+        public ActionResult AuthorizeGithub(string code, string state)
+        {
+            return Redirect($"/home/profile/{code}");
         }
 
         [HttpGet]

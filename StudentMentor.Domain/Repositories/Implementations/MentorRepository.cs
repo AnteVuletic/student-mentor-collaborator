@@ -82,5 +82,16 @@ namespace StudentMentor.Domain.Repositories.Implementations
             await _studentMentorDbContext.SaveChangesAsync();
             return new ResponseResult<Mentor>(mentor);
         }
+
+        public async Task<MentorModel> GetStudentsMentor(int studentId)
+        {
+            var mentor = await _studentMentorDbContext
+                .Mentors
+                .Where(m => m.Students.Any(s => s.Id == studentId))
+                .ProjectTo<MentorModel>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+
+            return mentor;
+        }
     }
 }

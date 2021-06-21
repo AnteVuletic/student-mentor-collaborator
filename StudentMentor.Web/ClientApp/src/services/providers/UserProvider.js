@@ -32,13 +32,11 @@ const UserProvider = ({ children }) => {
   const token = localStorage.getItem("token");
   const tokenParsed = parseJwt(token);
   const history = useHistory();
-  const [role, setRole] = useState(tokenParsed?.role);
-  const [userId, setUserId] = useState(tokenParsed?.userId);
+  const [role] = useState(tokenParsed?.role);
+  const [userId] = useState(tokenParsed?.userId);
 
   const logOut = () => {
     localStorage.removeItem("token");
-    setRole(null);
-    setUserId(null);
     history.push("/login");
   };
 

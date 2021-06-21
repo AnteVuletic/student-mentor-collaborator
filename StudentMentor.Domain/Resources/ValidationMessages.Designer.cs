@@ -79,6 +79,15 @@ namespace StudentMentor.Domain.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The message you&apos;re trying to delete was not found.
+        /// </summary>
+        internal static string MessageNotFound {
+            get {
+                return ResourceManager.GetString("MessageNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password should be atleast {0} characters long.
         /// </summary>
         internal static string PasswordShort {

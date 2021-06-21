@@ -2,9 +2,10 @@ import React, { useContext, useEffect } from "react";
 import { Box } from "@material-ui/core";
 import Students from "./Students";
 import Mentors from "./Mentors";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import { MenuContext } from "../../../services/providers/MenuProvider";
 import InviteMentor from "./InviteMentor";
+import EditStudent from "./EditStudent";
 
 const baseUrl = "/home/admin";
 const adminScreenTabs = {
@@ -38,6 +39,11 @@ const AdminScreen = () => {
             <Route exact path={adminScreenTabs.studentRoute}>
               <Students />
             </Route>
+            <Route
+              path={`${adminScreenTabs.studentRoute}/edit-student/:studentId`}
+            >
+              <EditStudent />
+            </Route>
           </Switch>
         </Route>
         <Route path={adminScreenTabs.mentorsRoute}>
@@ -49,6 +55,9 @@ const AdminScreen = () => {
               <InviteMentor />
             </Route>
           </Switch>
+        </Route>
+        <Route path="">
+          <Redirect to={adminScreenTabs.studentRoute} />
         </Route>
       </Switch>
     </Box>

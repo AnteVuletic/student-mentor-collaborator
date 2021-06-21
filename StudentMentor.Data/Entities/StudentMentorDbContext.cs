@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudentMentor.Data.Entities.Models;
-using StudentMentor.Data.Enums;
+using StudentMentor.Data.Entities.Models.Github;
 
 namespace StudentMentor.Data.Entities
 {
@@ -15,6 +15,10 @@ namespace StudentMentor.Data.Entities
         public DbSet<Mentor> Mentors { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Commit> Commits { get; set; }
+        public DbSet<PushActivity> PushActivities { get; set; }
+        public DbSet<FileLog> FileLogs { get; set; }
+        public DbSet<File> Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

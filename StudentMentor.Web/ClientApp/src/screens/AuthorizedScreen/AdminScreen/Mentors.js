@@ -61,6 +61,19 @@ const Mentors = () => {
 
   return (
     <TableContainer>
+      <Grid container item>
+        <Link to="/home/admin/mentors/invite">
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            color="primary"
+            startIcon={<MailOutline />}
+          >
+            Send invite
+          </Button>
+        </Link>
+      </Grid>
       <Table>
         <TableHead>
           <TableRow>

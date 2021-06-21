@@ -19,6 +19,94 @@ namespace StudentMentor.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.File", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Files");
+                });
+
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.Commit", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PushActivityId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PushActivityId");
+
+                    b.ToTable("Commits", "github");
+                });
+
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.FileLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ChangeType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CommitId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("File")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommitId");
+
+                    b.ToTable("FileLogs", "github");
+                });
+
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.PushActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Ref")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RepositoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RepositoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RepositoryId");
+
+                    b.ToTable("PushActivities", "github");
+                });
+
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -29,8 +117,14 @@ namespace StudentMentor.Data.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("FileId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("MessageCreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("PushActivityId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("UserFromId")
                         .HasColumnType("int");
@@ -39,6 +133,14 @@ namespace StudentMentor.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FileId")
+                        .IsUnique()
+                        .HasFilter("[FileId] IS NOT NULL");
+
+                    b.HasIndex("PushActivityId")
+                        .IsUnique()
+                        .HasFilter("[PushActivityId] IS NOT NULL");
 
                     b.HasIndex("UserFromId");
 
@@ -94,16 +196,64 @@ namespace StudentMentor.Data.Migrations
                 {
                     b.HasBaseType("StudentMentor.Data.Entities.Models.User");
 
+                    b.Property<int?>("FinalsPaperId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GithubAccessKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GithubBearerToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GithubRepositoryId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("MentorId")
                         .HasColumnType("int");
+
+                    b.HasIndex("FinalsPaperId")
+                        .IsUnique()
+                        .HasFilter("[FinalsPaperId] IS NOT NULL");
+
+                    b.HasIndex("GithubAccessKey")
+                        .IsUnique()
+                        .HasFilter("[GithubAccessKey] IS NOT NULL");
 
                     b.HasIndex("MentorId");
 
                     b.HasDiscriminator().HasValue(0);
                 });
 
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.Commit", b =>
+                {
+                    b.HasOne("StudentMentor.Data.Entities.Models.Github.PushActivity", "PushActivity")
+                        .WithMany("Commits")
+                        .HasForeignKey("PushActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PushActivity");
+                });
+
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.FileLog", b =>
+                {
+                    b.HasOne("StudentMentor.Data.Entities.Models.Github.Commit", "Commit")
+                        .WithMany("FileLogs")
+                        .HasForeignKey("CommitId");
+
+                    b.Navigation("Commit");
+                });
+
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.Message", b =>
                 {
+                    b.HasOne("StudentMentor.Data.Entities.Models.File", "File")
+                        .WithOne("Message")
+                        .HasForeignKey("StudentMentor.Data.Entities.Models.Message", "FileId");
+
+                    b.HasOne("StudentMentor.Data.Entities.Models.Github.PushActivity", "PushActivity")
+                        .WithOne("Message")
+                        .HasForeignKey("StudentMentor.Data.Entities.Models.Message", "PushActivityId");
+
                     b.HasOne("StudentMentor.Data.Entities.Models.User", "UserFrom")
                         .WithMany("MessagesSent")
                         .HasForeignKey("UserFromId")
@@ -114,6 +264,10 @@ namespace StudentMentor.Data.Migrations
                         .HasForeignKey("UserToId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.Navigation("File");
+
+                    b.Navigation("PushActivity");
+
                     b.Navigation("UserFrom");
 
                     b.Navigation("UserTo");
@@ -121,12 +275,37 @@ namespace StudentMentor.Data.Migrations
 
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.Student", b =>
                 {
+                    b.HasOne("StudentMentor.Data.Entities.Models.File", "FinalsPaper")
+                        .WithOne("Student")
+                        .HasForeignKey("StudentMentor.Data.Entities.Models.Student", "FinalsPaperId");
+
                     b.HasOne("StudentMentor.Data.Entities.Models.Mentor", "Mentor")
                         .WithMany("Students")
                         .HasForeignKey("MentorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.Navigation("FinalsPaper");
+
                     b.Navigation("Mentor");
+                });
+
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.File", b =>
+                {
+                    b.Navigation("Message");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.Commit", b =>
+                {
+                    b.Navigation("FileLogs");
+                });
+
+            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.PushActivity", b =>
+                {
+                    b.Navigation("Commits");
+
+                    b.Navigation("Message");
                 });
 
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.User", b =>

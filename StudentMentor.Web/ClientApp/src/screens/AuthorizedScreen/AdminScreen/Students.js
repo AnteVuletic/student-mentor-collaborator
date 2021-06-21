@@ -12,7 +12,8 @@ import {
   TableRow,
   Typography,
 } from "@material-ui/core";
-import { Delete } from "@material-ui/icons";
+import { Delete, Edit } from "@material-ui/icons";
+import { Link } from "react-router-dom";
 
 const Students = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -76,6 +77,11 @@ const Students = () => {
                 >
                   <Delete />
                 </IconButton>
+                <Link to={`/home/admin/students/edit-student/${student.id}`}>
+                  <IconButton color="primary">
+                    <Edit />
+                  </IconButton>
+                </Link>
               </TableCell>
             </TableRow>
           ))}
