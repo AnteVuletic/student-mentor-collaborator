@@ -17,7 +17,6 @@ import ErrorPrinter from "../ErrorPrinter";
 import { sendMessageToHub } from "../../utils/hubs";
 
 const MessageSender = ({ students, mentor }) => {
-  const [rows, setRows] = useState(3);
   const [isSending, setIsSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [backendError, setBackendError] = useState(null);
@@ -58,9 +57,9 @@ const MessageSender = ({ students, mentor }) => {
     <Grid container>
       <Grid item xs={12}>
         <form onSubmit={handleSubmit(sendMessage)}>
-          <Grid container spacing={2}>
-            <Grid item xs={3}>
-              {students && (
+          <Grid container justify="space-between" spacing={2}>
+            {students && (
+              <Grid item xs={3}>
                 <Controller
                   name="userToId"
                   control={control}
@@ -79,7 +78,7 @@ const MessageSender = ({ students, mentor }) => {
                         required
                       >
                         {[
-                          <MenuItem disabled key={-1} value="">
+                          <MenuItem disabled key={-1} value={0}>
                             Choose student
                           </MenuItem>,
                           ...students.map((s) => (
@@ -95,8 +94,10 @@ const MessageSender = ({ students, mentor }) => {
                     </FormControl>
                   )}
                 />
-              )}
-              {mentor && (
+              </Grid>
+            )}
+            {mentor && (
+              <Grid item xs={3}>
                 <FormControl error={!!errors.userToId} fullWidth>
                   <Select
                     value={mentor.id}
@@ -110,8 +111,8 @@ const MessageSender = ({ students, mentor }) => {
                     </MenuItem>
                   </Select>
                 </FormControl>
-              )}
-            </Grid>
+              </Grid>
+            )}
             <Grid item xs={12}>
               <Controller
                 name="content"
@@ -123,18 +124,14 @@ const MessageSender = ({ students, mentor }) => {
                   <TextField
                     value={value}
                     onChange={onChange}
-                    onBlur={(e) => {
-                      setRows(3);
-                      onBlur(e);
-                    }}
-                    onFocus={() => setRows(5)}
+                    onBlur={onBlur}
                     variant="outlined"
                     placeholder="Type in your message here"
                     multiline
                     fullWidth
                     helperText={errors?.content ? errors.content.message : null}
                     error={!!errors.content}
-                    rows={rows}
+                    rows={3}
                   />
                 )}
               />

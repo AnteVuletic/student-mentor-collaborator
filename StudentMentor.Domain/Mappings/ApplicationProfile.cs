@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper;
+using StudentMentor.Data.Entities;
 using StudentMentor.Data.Entities.Models;
 using StudentMentor.Data.Entities.Models.Github;
 using StudentMentor.Data.Enums;
@@ -26,14 +27,7 @@ namespace StudentMentor.Domain.Mappings
                         LastName = s.Mentor.LastName
                     }
                     : null))
-                .ForMember(m => m.FinalsPaper, opts => opts.MapFrom(x => x.FinalsPaperId.HasValue
-                    ? new FileModel
-                    {
-                        FileName = x.FinalsPaper.FileName,
-                        Url = @$"{baseUrl}\{x.FinalsPaper.FilePath}",
-                        Id = x.FinalsPaper.Id
-                    }
-                    : null));
+                .ForMember(m => m.HasPaper, opts => opts.MapFrom(x => x.FinalPapers.Any()));
 
             CreateMap<Mentor, MentorModel>()
                 .IncludeBase<User, UserModel>()
@@ -85,12 +79,21 @@ namespace StudentMentor.Domain.Mappings
                         Url = @$"{baseUrl}\{x.File.FilePath}",
                         Id = x.File.Id,
                     }
-                    : null));
+                    : null))
+                .ForMember(m => m.Comments, src => src.MapFrom(x => x.Comments.Select(c => new CommentModel
+                {
+                    Id = c.Id,
+                    Content = c.Content,
+                    UserFrom = new UserModel
+                    {
+                        Id = c.User.Id,
+                        Email = c.User.Email,
+                        FirstName = c.User.FirstName,
+                        LastName = c.User.LastName
+                    }
+                })));
+
             CreateMap<MessageModel, Message>();
-            CreateMap<Student, FileModel>()
-                .ForMember(f => f.Id, src => src.MapFrom(x => x.FinalsPaperId))
-                .ForMember(f => f.FileName, src => src.MapFrom(x => x.FinalsPaper.FileName))
-                .ForMember(f => f.Url, src => src.MapFrom(x => @$"{baseUrl}\{x.FinalsPaper.FilePath}"));
 
             CreateMap<SendMessageModel, Message>();
 
@@ -111,6 +114,37 @@ namespace StudentMentor.Domain.Mappings
                             .ToList()
                     }
                 )));
+
+            CreateMap<StudentFile, FileModelWithComments>()
+                .ForMember(m => m.FileName, opts => opts.MapFrom(src => src.File.FileName))
+                .ForMember(m => m.Id, opts => opts.MapFrom(src => src.File.Id))
+                .ForMember(m => m.Url, opts => opts.MapFrom(src => @$"{baseUrl}\{src.File.FilePath}"))
+                .ForMember(m => m.Comments, opts => opts.MapFrom(src => src.File.Message.Comments.Select(c =>
+                    new CommentModel
+                    {
+                        Id = c.Id,
+                        Content = c.Content,
+                        UserFrom = new UserModel
+                        {
+                            Id = c.User.Id,
+                            Email = c.User.Email,
+                            FirstName = c.User.FirstName,
+                            LastName = c.User.LastName
+                        }
+                    })));
+
+            CreateMap<Comment, CommentModel>()
+                .ForMember(c => c.UserFrom, opts => opts.MapFrom(src => new UserModel
+                {
+                    Id = src.User.Id,
+                    Email = src.User.Email,
+                    FirstName = src.User.FirstName,
+                    LastName = src.User.LastName
+                }))
+                .ForMember(c => c.UserMessageToId,
+                    opts => opts.MapFrom(src =>
+                        src.Message.UserToId == src.UserId ? src.Message.UserFromId : src.Message.UserToId));
+            CreateMap<CreateCommentModel, Comment>();
         }
     }
 }

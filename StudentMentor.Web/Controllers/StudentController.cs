@@ -102,15 +102,6 @@ namespace StudentMentor.Web.Controllers
         }
 
         [Authorize(Policy = Policies.Student)]
-        [HttpGet(nameof(GetFinalsPaper))]
-        public async Task<FileModel> GetFinalsPaper()
-        {
-            var fileModel = await _studentRepository.GetFinalsPaper();
-
-            return fileModel;
-        }
-
-        [Authorize(Policy = Policies.Student)]
         [HttpPatch(nameof(PatchRepositoryId))]
         public async Task<ActionResult> PatchRepositoryId(RepositoryModel model)
         {
@@ -133,6 +124,24 @@ namespace StudentMentor.Web.Controllers
             var students = await _studentRepository.GetMentoringStudents(_claimProvider.GetUserId());
 
             return Ok(students);
+        }
+
+        [Authorize(Policy = Policies.Student)]
+        [HttpGet(nameof(GetFinalsPapers))]
+        public async Task<ActionResult> GetFinalsPapers()
+        {
+            var response = await _studentRepository.GetFinalsPapersWithComments();
+
+            return Ok(response);
+        }
+
+        [Authorize(Policy =  Policies.Mentor)]
+        [HttpGet("GetFinalsPapersForMentor/{studentId}")]
+        public async Task<ActionResult> GetFinalsPapersForMentor([FromRoute] int studentId)
+        {
+            var response = await _studentRepository.GetFinalsPapersWithComments(studentId);
+
+            return Ok(response);
         }
 
         [Authorize(Policy = Policies.Student)]

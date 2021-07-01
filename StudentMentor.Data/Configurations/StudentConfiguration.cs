@@ -17,10 +17,9 @@ namespace StudentMentor.Data.Configurations
             builder.HasIndex(x => x.GithubAccessKey)
                 .IsUnique();
 
-            builder.HasOne(s => s.FinalsPaper)
+            builder.HasMany(s => s.FinalPapers)
                 .WithOne(fp => fp.Student)
-                .HasForeignKey<Student>(s => s.FinalsPaperId)
-                .IsRequired(false);
+                .HasForeignKey(sf => sf.StudentId);
         }
     }
 }

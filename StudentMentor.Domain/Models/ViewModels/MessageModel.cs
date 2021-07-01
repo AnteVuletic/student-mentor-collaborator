@@ -14,6 +14,7 @@ namespace StudentMentor.Domain.Models.ViewModels
         public string RepositoryName { get; set; }
         public string Ref { get; set; }
         public FileModel File { get; set; }
+        public ICollection<CommentModel> Comments { get; set; }
         public ICollection<GithubMessageCommitModel> Commits { get; set; }
     }
 
@@ -38,5 +39,10 @@ namespace StudentMentor.Domain.Models.ViewModels
         public int Id { get; set; }
         public string FileName { get; set; }
         public string Url { get; set; }
+    }
+
+    public class FileModelWithComments : FileModel
+    {
+        public ICollection<CommentModel> Comments { get; set; }
     }
 }

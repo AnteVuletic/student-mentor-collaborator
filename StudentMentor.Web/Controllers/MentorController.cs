@@ -12,17 +12,20 @@ namespace StudentMentor.Web.Controllers
     public class MentorController : ApiController
     {
         private readonly IMentorRepository _mentorRepository;
+        private readonly IStudentRepository _studentRepository;
         private readonly IJwtService _jwtService;
         private readonly EmailHandler _emailSender;
         private readonly IClaimProvider _claimProvider;
 
         public MentorController(
             IMentorRepository mentorRepository,
+            IStudentRepository studentRepository,
             IJwtService jwtService,
             EmailHandler emailSender,
             IClaimProvider claimProvider
         ) {
             _mentorRepository = mentorRepository;
+            _studentRepository = studentRepository;
             _jwtService = jwtService;
             _emailSender = emailSender;
             _claimProvider = claimProvider;
@@ -58,6 +61,30 @@ namespace StudentMentor.Web.Controllers
             var mentorResponse = await _mentorRepository.CreateMentor(model);
             var token = _jwtService.GetTokenForEmailInvite(mentorResponse.Data.Id);
             await _emailSender.SendMentorInviteEmail(mentorResponse.Data, token);
+
+            return Ok();
+        }
+
+        [Authorize(Policy = Policies.Mentor)]
+        [HttpPatch("ClaimStudent/{Id}")]
+        public async Task<ActionResult> ClaimStudent([FromRoute] int id)
+        {
+            var response = await _studentRepository.SetMentor(id, _claimProvider.GetUserId());
+
+            if (response.IsError)
+                return BadRequest(response.Message);
+
+            return Ok();
+        }
+
+        [Authorize(Policy = Policies.Mentor)]
+        [HttpPatch("UnClaimStudent/{Id}")]
+        public async Task<ActionResult> UnClaimStudent([FromRoute] int id)
+        {
+            var response = await _studentRepository.SetMentor(id, null);
+
+            if (response.IsError)
+                return BadRequest(response.Message);
 
             return Ok();
         }

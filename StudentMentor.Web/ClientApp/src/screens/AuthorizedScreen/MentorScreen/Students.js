@@ -15,16 +15,25 @@ import {
   Toolbar,
   IconButton,
   Button,
+  Tooltip,
+  Avatar,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
 } from "@material-ui/core";
 
 import { Close } from "@material-ui/icons";
 import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
-import { useNavigationStyles } from "../../../theme/main";
+import { useAvatarStyles, useNavigationStyles } from "../../../theme/main";
 
 const Students = () => {
+  const avatarStyle = useAvatarStyles();
   const [isLoading, setIsLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [papers, setPapers] = useState(null);
+  const [paperActiveIndex, setPaperActiveIndex] = useState(null);
   const styles = useNavigationStyles();
   const fetchStudents = () => {
     setIsLoading(true);
@@ -34,10 +43,44 @@ const Students = () => {
     });
   };
 
+  const loadAndSetPaper = (studentId) => {
+    return axios
+      .get(`api/Student/GetFinalsPapersForMentor/${studentId}`)
+      .then((res) => {
+        setPapers(res.data);
+        if (res.data.length > 0) {
+          setPaperActiveIndex(0);
+        }
+      });
+  };
+
   useEffect(fetchStudents, []);
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleOpenModal = (studentId) => {
+    loadAndSetPaper(studentId).then(() => {
+      setIsModalOpen(true);
+    });
+  };
+
+  const handleCloseModal = () => {
+    setPaperActiveIndex(null);
+    setPapers(null);
+    setIsModalOpen(false);
+  };
+
+  const handleClaimStudent = (studentId) => {
+    setIsLoading(true);
+    axios.patch(`api/Mentor/ClaimStudent/${studentId}`).then(fetchStudents);
+  };
+
+  const handleUnClaimStudent = (studentId) => {
+    setIsLoading(true);
+    axios.patch(`api/Mentor/UnClaimStudent/${studentId}`).then(fetchStudents);
+  };
+
+  const handlePaperActiveIndex = (event) => {
+    setPaperActiveIndex(+event.target.id);
+  };
 
   if (isLoading) return <LinearProgress />;
 
@@ -72,43 +115,153 @@ const Students = () => {
               <TableCell>{student.lastName}</TableCell>
               <TableCell>{student.email}</TableCell>
               <TableCell>
-                {student.mentor
-                  ? `${student.mentor.firstName} ${student.mentor.lastName}`
-                  : "No mentor"}
-              </TableCell>
-              <TableCell>
-                {student.finalsPaper && (
+                {student.mentor && (
+                  <Tooltip title="Unclaim student">
+                    <Button
+                      fullWidth
+                      color="secondary"
+                      variant="outlined"
+                      onClick={() => handleUnClaimStudent(student.id)}
+                    >
+                      {student.mentor.firstName} {student.mentor.lastName}
+                    </Button>
+                  </Tooltip>
+                )}
+                {!student.mentor && (
                   <Button
                     fullWidth
                     color="primary"
                     variant="outlined"
-                    onClick={handleOpenModal}
+                    onClick={() => handleClaimStudent(student.id)}
                   >
-                    Open preview
+                    Claim
                   </Button>
                 )}
-                <Dialog open={isModalOpen} onClose={handleCloseModal} fullWidth>
-                  <AppBar className={styles.menu}>
-                    <Toolbar>
-                      <IconButton
-                        edge="start"
-                        color="inherit"
-                        onClick={handleCloseModal}
-                        aria-label="close"
-                      >
-                        <Close />
-                      </IconButton>
-                      <Typography variant="h6">
-                        {student.finalsPaper.fileName}
-                      </Typography>
-                    </Toolbar>
-                  </AppBar>
-                  <DocViewer
-                    pluginRenderers={DocViewerRenderers}
-                    documents={[{ uri: student.finalsPaper.url }]}
-                    style={{ width: "100%", height: "100%" }}
-                  />
-                </Dialog>
+              </TableCell>
+              <TableCell>
+                {student.hasPaper && (
+                  <>
+                    <Button
+                      fullWidth
+                      color="primary"
+                      variant="outlined"
+                      onClick={() => handleOpenModal(student.id)}
+                    >
+                      View papers
+                    </Button>
+                    <Dialog
+                      open={isModalOpen}
+                      onClose={handleCloseModal}
+                      fullWidth
+                    >
+                      <AppBar className={styles.menu}>
+                        <Toolbar>
+                          <IconButton
+                            edge="start"
+                            color="inherit"
+                            onClick={handleCloseModal}
+                            aria-label="close"
+                          >
+                            <Close />
+                          </IconButton>
+                          <Typography variant="h6">
+                            {student.firstName} {student.lastName}
+                          </Typography>
+                        </Toolbar>
+                      </AppBar>
+                      <Grid container item xs={12}>
+                        <Grid item xs={12}>
+                          {papers && (
+                            <Tabs
+                              value={paperActiveIndex}
+                              onChange={handlePaperActiveIndex}
+                            >
+                              {papers?.map((p, index) => (
+                                <Tab
+                                  label={`Version - ${papers.length - index}`}
+                                  key={p.id}
+                                  id={index}
+                                />
+                              ))}
+                            </Tabs>
+                          )}
+                        </Grid>
+                        <Grid item xs={12}>
+                          {papers?.map((paper, index) => (
+                            <Card key={index}>
+                              {paperActiveIndex === index && (
+                                <CardContent>
+                                  {!paper.comments.length && (
+                                    <div>No comments</div>
+                                  )}
+                                  {paper.comments.length !== 0 &&
+                                    paper.comments.map((comment) => (
+                                      <Grid
+                                        key={comment.id}
+                                        container
+                                        spacing={2}
+                                        item
+                                        xs={12}
+                                        style={{
+                                          padding: "2px 8px",
+                                          margin: "0 12px 4px 12px",
+                                        }}
+                                        alignItems="center"
+                                      >
+                                        <Grid item xs={3}>
+                                          <Tooltip
+                                            title={`${comment.userFrom.firstName} ${comment.userFrom.lastName}`}
+                                          >
+                                            <Avatar
+                                              className={
+                                                comment.userFrom.id ===
+                                                comment.userFrom.id
+                                                  ? avatarStyle.avatarPrimary
+                                                  : avatarStyle.avatarSecondary
+                                              }
+                                            >
+                                              {comment.userFrom.firstName?.charAt(
+                                                0
+                                              )}
+                                              {comment.userFrom.lastName?.charAt(
+                                                0
+                                              )}
+                                            </Avatar>
+                                          </Tooltip>
+                                        </Grid>
+                                        <Grid item xs={9}>
+                                          <Typography
+                                            variant="body2"
+                                            component="p"
+                                          >
+                                            {comment.content}
+                                          </Typography>
+                                        </Grid>
+                                      </Grid>
+                                    ))}
+                                  <div>
+                                    <a
+                                      href={paper.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      {paper.fileName}
+                                    </a>
+                                    <DocViewer
+                                      pluginRenderers={DocViewerRenderers}
+                                      documents={[{ uri: paper.url }]}
+                                      style={{ width: "100%", height: "70vh" }}
+                                    />
+                                  </div>
+                                </CardContent>
+                              )}
+                            </Card>
+                          ))}
+                        </Grid>
+                      </Grid>
+                    </Dialog>
+                  </>
+                )}
               </TableCell>
             </TableRow>
           ))}

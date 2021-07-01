@@ -19,6 +19,8 @@ namespace StudentMentor.Data.Entities
         public DbSet<PushActivity> PushActivities { get; set; }
         public DbSet<FileLog> FileLogs { get; set; }
         public DbSet<File> Files { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<StudentFile> StudentFiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,54 +1,100 @@
 import axios from "axios";
-import React, { useState, createContext, useCallback, useEffect } from "react";
+import React, { useState, createContext, useEffect } from "react";
 import {
   subscribeToMessageHub,
   startMessageHubConnection,
+  subscribeToCommentHub,
 } from "../../utils/hubs";
 
 const initialState = {
   messages: [],
   isEndOfMessages: false,
   isMessageLoading: false,
+  studentFilterId: 0,
 };
 
 export const MessageContext = createContext({
   state: { ...initialState },
-  loadMessagePage: () => {},
+  handleStudentFilterId: () => {},
+  setPage: () => {},
 });
-const pageSize = 5;
+const pageSize = 10;
 
 const MessageProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
+  const [studentFilterId, setStudentFilterId] = useState(0);
   const [isEndOfMessages, setIsEndOfMessages] = useState(false);
   const [isMessageLoading, setIsMessageLoading] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, _setPage] = useState(0);
 
   useEffect(() => {
-    startMessageHubConnection().then(() =>
-      subscribeToMessageHub((response) => {
-        setMessages((prev) => [response.data, ...prev]);
-      })
-    );
-  }, [setMessages]);
+    startMessageHubConnection()
+      .then(() =>
+        subscribeToMessageHub((response) => {
+          if (!studentFilterId) {
+            setMessages((prev) => [response.data, ...prev]);
+            return;
+          }
 
-  const loadMessagePage = useCallback(() => {
+          if (
+            studentFilterId &&
+            (response.data.userFrom.id === studentFilterId ||
+              response.data.userTo.id === studentFilterId)
+          ) {
+            setMessages((prev) => [response.data, ...prev]);
+          }
+        })
+      )
+      .then(() => {
+        subscribeToCommentHub((response) => {
+          setMessages((prev) => {
+            const prevCopied = [...prev];
+            const messageIndex = prevCopied.findIndex(
+              (m) => m.id === response.messageId
+            );
+            prevCopied[messageIndex].comments = [
+              ...prevCopied[messageIndex].comments,
+              response,
+            ];
+
+            return prevCopied;
+          });
+        });
+      });
+  }, [setMessages, studentFilterId]);
+
+  useEffect(() => {
     setIsMessageLoading(true);
+    let params = { page, pageSize };
+
+    if (studentFilterId) {
+      params = { ...params, studentId: studentFilterId };
+    }
+
     axios
-      .get(`api/Message`, { params: { page, pageSize } })
+      .get(`api/Message`, {
+        params: params,
+      })
       .then((response) => {
         setIsEndOfMessages(response.data.length < pageSize);
-
         setMessages((m) => [...m, ...response.data]);
-        setPage(page + 1);
       })
       .finally(() => {
         setIsMessageLoading(false);
       });
-  }, [page, setPage, setMessages, setIsEndOfMessages]);
+  }, [studentFilterId, page]);
+
+  const handleStudentFilterId = (event) => {
+    const newFilterStudentId = event.target.value;
+    setMessages([]);
+    _setPage(0);
+    setStudentFilterId(newFilterStudentId);
+  };
 
   const value = {
-    state: { messages, isEndOfMessages, isMessageLoading },
-    loadMessagePage,
+    state: { messages, isEndOfMessages, isMessageLoading, studentFilterId },
+    handleStudentFilterId,
+    setPage: _setPage,
   };
 
   return (

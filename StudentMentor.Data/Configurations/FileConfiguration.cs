@@ -12,11 +12,6 @@ namespace StudentMentor.Data.Configurations
                 .WithOne(m => m.File)
                 .HasForeignKey<Message>(m => m.FileId)
                 .IsRequired(false);
-
-            builder.HasOne(f => f.Student)
-                .WithOne(m => m.FinalsPaper)
-                .HasForeignKey<Student>(m => m.FinalsPaperId)
-                .IsRequired(false);
         }
     }
 }

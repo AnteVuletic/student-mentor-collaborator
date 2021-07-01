@@ -122,6 +122,7 @@ namespace StudentMentor.Web.Infrastructure.Extensions
             services.AddTransient<IMessageRepository, MessageRepository>();
             services.AddTransient<IGithubRepository, GithubRepository>();
             services.AddTransient<IFileRepository, FileRepository>();
+            services.AddTransient<ICommentRepository, CommentRepository>();
 
             return services;
         }

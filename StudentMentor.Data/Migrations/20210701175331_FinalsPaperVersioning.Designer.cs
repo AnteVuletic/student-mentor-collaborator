@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentMentor.Data.Entities;
 
 namespace StudentMentor.Data.Migrations
 {
     [DbContext(typeof(StudentMentorDbContext))]
-    partial class StudentMentorDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210701175331_FinalsPaperVersioning")]
+    partial class FinalsPaperVersioning
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentMentor.Data.Entities;
 
 namespace StudentMentor.Data.Migrations
 {
     [DbContext(typeof(StudentMentorDbContext))]
-    partial class StudentMentorDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210630191541_AddCommentsToMessages")]
+    partial class AddCommentsToMessages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,32 +205,6 @@ namespace StudentMentor.Data.Migrations
                     b.HasDiscriminator<int>("UserRole");
                 });
 
-            modelBuilder.Entity("StudentMentor.Data.Entities.StudentFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("FileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TimeCreated")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FileId")
-                        .IsUnique();
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("StudentFiles");
-                });
-
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.Admin", b =>
                 {
                     b.HasBaseType("StudentMentor.Data.Entities.Models.User");
@@ -247,6 +223,9 @@ namespace StudentMentor.Data.Migrations
                 {
                     b.HasBaseType("StudentMentor.Data.Entities.Models.User");
 
+                    b.Property<int?>("FinalsPaperId")
+                        .HasColumnType("int");
+
                     b.Property<string>("GithubAccessKey")
                         .HasColumnType("nvarchar(450)");
 
@@ -258,6 +237,10 @@ namespace StudentMentor.Data.Migrations
 
                     b.Property<int?>("MentorId")
                         .HasColumnType("int");
+
+                    b.HasIndex("FinalsPaperId")
+                        .IsUnique()
+                        .HasFilter("[FinalsPaperId] IS NOT NULL");
 
                     b.HasIndex("GithubAccessKey")
                         .IsUnique()
@@ -336,31 +319,18 @@ namespace StudentMentor.Data.Migrations
                     b.Navigation("UserTo");
                 });
 
-            modelBuilder.Entity("StudentMentor.Data.Entities.StudentFile", b =>
-                {
-                    b.HasOne("StudentMentor.Data.Entities.Models.File", "File")
-                        .WithOne("StudentFile")
-                        .HasForeignKey("StudentMentor.Data.Entities.StudentFile", "FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("StudentMentor.Data.Entities.Models.Student", "Student")
-                        .WithMany("FinalPapers")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("File");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.Student", b =>
                 {
+                    b.HasOne("StudentMentor.Data.Entities.Models.File", "FinalsPaper")
+                        .WithOne("Student")
+                        .HasForeignKey("StudentMentor.Data.Entities.Models.Student", "FinalsPaperId");
+
                     b.HasOne("StudentMentor.Data.Entities.Models.Mentor", "Mentor")
                         .WithMany("Students")
                         .HasForeignKey("MentorId")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("FinalsPaper");
 
                     b.Navigation("Mentor");
                 });
@@ -369,7 +339,7 @@ namespace StudentMentor.Data.Migrations
                 {
                     b.Navigation("Message");
 
-                    b.Navigation("StudentFile");
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.Github.Commit", b =>
@@ -399,11 +369,6 @@ namespace StudentMentor.Data.Migrations
             modelBuilder.Entity("StudentMentor.Data.Entities.Models.Mentor", b =>
                 {
                     b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("StudentMentor.Data.Entities.Models.Student", b =>
-                {
-                    b.Navigation("FinalPapers");
                 });
 #pragma warning restore 612, 618
         }

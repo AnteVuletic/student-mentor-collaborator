@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using StudentMentor.Data.Entities.Models.Github;
 
 namespace StudentMentor.Data.Entities.Models
@@ -20,5 +21,7 @@ namespace StudentMentor.Data.Entities.Models
         public File File { get; set; }
 
         public DateTime MessageCreatedAt { get; set; }
+
+        public ICollection<Comment> Comments { get; set; }
     }
 }

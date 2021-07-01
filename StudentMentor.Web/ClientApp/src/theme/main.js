@@ -35,4 +35,12 @@ export const useAvatarStyles = makeStyles((theme) => ({
   },
 }));
 
+export const useCardMessageStyles = makeStyles((theme) => ({
+  wrapper: {
+    padding: "8px",
+    marginTop: "4px",
+    width: "100%",
+  },
+}));
+
 export default main;

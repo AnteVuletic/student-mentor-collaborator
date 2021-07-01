@@ -28,6 +28,10 @@ namespace StudentMentor.Data.Configurations
                 .WithOne(f => f.Message)
                 .HasForeignKey<Message>(m => m.FileId)
                 .IsRequired(false);
+
+            builder.HasMany(m => m.Comments)
+                .WithOne(c => c.Message)
+                .HasForeignKey(c => c.MessageId);
         }
     }
 }

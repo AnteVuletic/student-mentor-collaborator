@@ -12,9 +12,8 @@ namespace StudentMentor.Domain.Repositories.Interfaces
         Task<ResponseResult<Student>> RegisterStudent(RegistrationModel model);
         Task<ICollection<StudentModel>> GetStudents();
         Task<ResponseResult<StudentModel>> GetStudent(int studentId);
-        Task<FileModel> GetFinalsPaper();
         Task<ResponseResult> DeleteStudent(int studentId);
-        Task<ResponseResult> SetMentor(int userId, int mentorId);
+        Task<ResponseResult> SetMentor(int userId, int? mentorId);
         Task<ResponseResult> RemoveMentor(int userId);
         Task<ResponseResult> PatchGithubOAuthKey(string accessKey);
         Task<ResponseResult<string>> GetOAuthKey();
@@ -22,7 +21,8 @@ namespace StudentMentor.Domain.Repositories.Interfaces
         Task<ResponseResult> PatchRepositoryId(int repositoryId);
         Task<ResponseResult<Student>> PatchFinalsPaper(File file);
         Task<ResponseResult<string>> GetGitHubAccessToken();
-        Task<ICollection<UserModel>> GetMentoringStudents(int mentorId);
+        Task<ICollection<StudentModel>> GetMentoringStudents(int mentorId);
+        Task<ICollection<FileModelWithComments>> GetFinalsPapersWithComments(int? studentId = null);
         Task<int?> GetRepositoryId();
     }
 }

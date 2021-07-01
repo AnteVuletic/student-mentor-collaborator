@@ -68,17 +68,6 @@ namespace StudentMentor.Domain.Repositories.Implementations
                 : new ResponseResult<StudentModel>(student);
         }
 
-        public async Task<FileModel> GetFinalsPaper()
-        {
-            var baseUrl = _webHostService.GetRootUrl();
-            var fileModel = await _dbContext
-                .Students
-                .Where(s => s.Id == _claimProvider.GetUserId() && s.FinalsPaperId.HasValue)
-                .ProjectTo<FileModel>(_mapper.ConfigurationProvider, new {baseUrl})
-                .FirstOrDefaultAsync();
-
-            return fileModel;
-        }
 
         public async Task<ResponseResult> DeleteStudent(int studentId)
         {
@@ -93,7 +82,7 @@ namespace StudentMentor.Domain.Repositories.Implementations
             return ResponseResult.Ok;
         }
 
-        public async Task<ResponseResult> SetMentor(int userId, int mentorId)
+        public async Task<ResponseResult> SetMentor(int userId, int? mentorId)
         {
             var student = await _dbContext.Students.FindAsync(userId);
             student.MentorId = mentorId;
@@ -143,7 +132,10 @@ namespace StudentMentor.Domain.Repositories.Implementations
         public async Task<ResponseResult<Student>> PatchFinalsPaper(File file)
         {
             var student = await _dbContext.Students.FindAsync(_claimProvider.GetUserId());
-            student.FinalsPaperId = file.Id;
+            student.FinalPapers.Add(new StudentFile
+            {
+                FileId = file.Id
+            });
 
             await _dbContext.SaveChangesAsync();
             return new ResponseResult<Student>(student);
@@ -169,15 +161,28 @@ namespace StudentMentor.Domain.Repositories.Implementations
             return ResponseResult.Ok;
         }
 
-        public async Task<ICollection<UserModel>> GetMentoringStudents(int mentorId)
+        public async Task<ICollection<StudentModel>> GetMentoringStudents(int mentorId)
         {
             var students = await _dbContext
                 .Students
-                .Where(s => s.MentorId == mentorId)
-                .ProjectTo<UserModel>(_mapper.ConfigurationProvider)
+                .Where(s => s.MentorId == mentorId || !s.MentorId.HasValue)
+                .ProjectTo<StudentModel>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return students;
+        }
+
+        public async Task<ICollection<FileModelWithComments>> GetFinalsPapersWithComments(int? studentId = null)
+        {
+            var baseUrl = _webHostService.GetRootUrl();
+            var filesWithComments = await _dbContext
+                .StudentFiles
+                .Where(sf => studentId.HasValue && sf.StudentId == studentId.Value ||  !studentId.HasValue && sf.StudentId == _claimProvider.GetUserId())
+                .OrderByDescending(sf => sf.TimeCreated)
+                .ProjectTo<FileModelWithComments>(_mapper.ConfigurationProvider, new { baseUrl })
+                .ToListAsync();
+
+            return filesWithComments;
         }
 
         public async Task<int?> GetRepositoryId()

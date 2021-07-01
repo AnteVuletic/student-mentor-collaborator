@@ -18,9 +18,9 @@ namespace StudentMentor.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<MessageModel>> GetPaged([FromQuery] int page, [FromQuery] int pageSize)
+        public async Task<ActionResult<MessageModel>> GetPaged([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] int? studentId)
         {
-            var messages = await _messageRepository.GetPage(page, pageSize);
+            var messages = await _messageRepository.GetPage(page, pageSize, studentId);
 
             return Ok(messages);
         }

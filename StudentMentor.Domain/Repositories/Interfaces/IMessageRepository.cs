@@ -8,7 +8,7 @@ namespace StudentMentor.Domain.Repositories.Interfaces
 {
     public interface IMessageRepository
     {
-        Task<ICollection<MessageModel>> GetPage(int page, int pageSize);
+        Task<ICollection<MessageModel>> GetPage(int page, int pageSize, int? studentId);
         Task<ResponseResult<MessageModel>> SendMessage(int fromId, SendMessageModel model);
         Task<ResponseResult<MessageModel>> SendGithubMessage(PushActivityEvent model);
         Task<MessageModel> GetMessageById(int id);

@@ -10,11 +10,14 @@ namespace StudentMentor.Web.Hubs
     public class MessagesHub : Hub
     {
         public const string SendMessageMethod = "MessageRecieved";
+        public const string SendCommentMethod = "CommentRecieved";
         private readonly IMessageRepository _messageRepository;
+        private readonly ICommentRepository _commentRepository;
 
-        public MessagesHub(IMessageRepository messageRepository)
+        public MessagesHub(IMessageRepository messageRepository, ICommentRepository commentRepository)
         {
             _messageRepository = messageRepository;
+            _commentRepository = commentRepository;
         }
 
         public async Task SendMessage(SendMessageModel message)
@@ -23,6 +26,20 @@ namespace StudentMentor.Web.Hubs
             var messageResponse = await _messageRepository.SendMessage(int.Parse(userId), message);
             var userToTask = Clients.User(message.UserToId.ToString()).SendAsync(SendMessageMethod, messageResponse);
             var userFromTask = Clients.User(userId).SendAsync(SendMessageMethod, messageResponse);
+
+            Task.WaitAll(userToTask, userFromTask);
+        }
+
+        public async Task SendComment(CreateCommentModel comment)
+        {
+            var userId = Context.UserIdentifier;
+            var commentResponse = await _commentRepository.Add(comment);
+            if (commentResponse.IsError)
+                return;
+
+            var commentData = commentResponse.Data;
+            var userToTask = Clients.User(commentData.UserMessageToId.ToString()).SendAsync(SendCommentMethod, commentData);
+            var userFromTask = Clients.User(userId).SendAsync(SendCommentMethod, commentData);
 
             Task.WaitAll(userToTask, userFromTask);
         }

@@ -1,29 +1,25 @@
-import {
-  Box,
-  debounce,
-  Grid,
-  LinearProgress,
-  Typography,
-  useScrollTrigger,
-} from "@material-ui/core";
+import { Box, Grid, LinearProgress, Typography } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 
 import MessageSender from "../../../components/MessageSender";
 import Message from "../../../components/Message";
 import { MessageContext } from "../../../services/providers/MessageProvider";
+import { FormLabel, Select, MenuItem } from "@material-ui/core";
 import { SentimentDissatisfied } from "@material-ui/icons";
+import useIntersect from "../../../utils/useInteresect";
 
 const MessageWall = () => {
-  const scrolledToEndTrigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 100,
+  const [setNode, entry] = useIntersect({
+    threshold: 1,
+    rootMargin: "0px",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const {
-    state: { isEndOfMessages, isMessageLoading, messages },
-    loadMessagePage,
+    state: { isEndOfMessages, isMessageLoading, messages, studentFilterId },
+    setPage,
+    handleStudentFilterId,
   } = useContext(MessageContext);
 
   useEffect(() => {
@@ -38,20 +34,38 @@ const MessageWall = () => {
   }, []);
 
   useEffect(() => {
-    if (scrolledToEndTrigger && !isEndOfMessages) {
-      debounce(loadMessagePage, 200)();
+    if (entry.isIntersecting && !isEndOfMessages) {
+      setPage((prev) => prev + 1);
     }
-  }, [scrolledToEndTrigger, loadMessagePage, isEndOfMessages]);
-
-  useEffect(() => {
-    loadMessagePage();
-  }, []);
+  }, [setPage, entry, isEndOfMessages]);
 
   if (isLoading) return <LinearProgress />;
 
   return (
     <Grid container justify="center" spacing={2}>
       <MessageSender students={students} />
+      <Grid item justify="center" container xs={12}>
+        <Grid item xs={6}>
+          <FormLabel>Filter by student</FormLabel>
+          <Select
+            onChange={handleStudentFilterId}
+            value={studentFilterId}
+            fullWidth
+            variant="outlined"
+          >
+            {[
+              <MenuItem key={-1} value={0}>
+                Filter by student
+              </MenuItem>,
+              ...students.map((s) => (
+                <MenuItem key={s.id} value={s.id}>
+                  {s.firstName} {s.lastName}
+                </MenuItem>
+              )),
+            ]}
+          </Select>
+        </Grid>
+      </Grid>
       <Grid item xs={6}>
         {messages.map((m) => (
           <Box key={m.id} mt={2}>
@@ -67,6 +81,7 @@ const MessageWall = () => {
           <SentimentDissatisfied />
         </Grid>
       )}
+      <Grid item xs={12} ref={setNode}></Grid>
     </Grid>
   );
 };

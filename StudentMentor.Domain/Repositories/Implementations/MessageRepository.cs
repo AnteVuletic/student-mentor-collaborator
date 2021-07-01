@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -30,13 +31,21 @@ namespace StudentMentor.Domain.Repositories.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ICollection<MessageModel>> GetPage(int page, int pageSize)
+        public async Task<ICollection<MessageModel>> GetPage(int page, int pageSize, int? studentId)
         {
             var baseUrl = _webHostService.GetRootUrl();
 
+            Expression<Func<Message, bool>> userFilterExpression = m =>
+                m.UserFromId == _claimProvider.GetUserId() || m.UserToId == _claimProvider.GetUserId();
+
+            if (studentId.HasValue)
+            {
+                userFilterExpression = m => m.UserFromId == studentId || m.UserToId == studentId;
+            }
+
             var messages = await _studentMentorDbContext
                 .Messages
-                .Where(m => m.UserFromId == _claimProvider.GetUserId() || m.UserToId == _claimProvider.GetUserId())
+                .Where(userFilterExpression)
                 .OrderByDescending(m => m.MessageCreatedAt)
                 .Skip(page * pageSize)
                 .Take(pageSize)
