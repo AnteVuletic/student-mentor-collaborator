@@ -25,10 +25,10 @@ namespace StudentMentor.Domain.Repositories.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ResponseResult<CommentModel>> Add(CreateCommentModel model)
+        public async Task<ResponseResult<CommentModel>> Add(CreateCommentModel model, int? userId = null)
         {
             var comment = _mapper.Map<Comment>(model);
-            comment.UserId = _claimProvider.GetUserId();
+            comment.UserId = userId ?? _claimProvider.GetUserId();
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
 

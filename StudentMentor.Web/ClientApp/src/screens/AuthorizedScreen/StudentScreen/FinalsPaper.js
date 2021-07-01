@@ -59,7 +59,7 @@ const FinalsPaper = () => {
       });
   };
 
-  const handlepaperActiveIndex = (event) => {
+  const handlePaperActiveIndex = (event) => {
     setPaperActiveIndex(+event.target.id);
   };
 
@@ -91,7 +91,7 @@ const FinalsPaper = () => {
                 orientation="vertical"
                 variant="scrollable"
                 value={paperActiveIndex}
-                onChange={handlepaperActiveIndex}
+                onChange={handlePaperActiveIndex}
               >
                 {papers?.map((p, index) => (
                   <Tab

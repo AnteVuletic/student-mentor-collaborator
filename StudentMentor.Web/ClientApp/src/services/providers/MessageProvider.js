@@ -28,39 +28,36 @@ const MessageProvider = ({ children }) => {
   const [page, _setPage] = useState(0);
 
   useEffect(() => {
-    startMessageHubConnection()
-      .then(() =>
-        subscribeToMessageHub((response) => {
-          if (!studentFilterId) {
-            setMessages((prev) => [response.data, ...prev]);
-            return;
-          }
+    startMessageHubConnection().then(() => {
+      subscribeToMessageHub((response) => {
+        if (!studentFilterId) {
+          setMessages((prev) => [response.data, ...prev]);
+          return;
+        }
 
-          if (
-            studentFilterId &&
-            (response.data.userFrom.id === studentFilterId ||
-              response.data.userTo.id === studentFilterId)
-          ) {
-            setMessages((prev) => [response.data, ...prev]);
-          }
-        })
-      )
-      .then(() => {
-        subscribeToCommentHub((response) => {
-          setMessages((prev) => {
-            const prevCopied = [...prev];
-            const messageIndex = prevCopied.findIndex(
-              (m) => m.id === response.messageId
-            );
-            prevCopied[messageIndex].comments = [
-              ...prevCopied[messageIndex].comments,
-              response,
-            ];
+        if (
+          studentFilterId &&
+          (response.data.userFrom.id === studentFilterId ||
+            response.data.userTo.id === studentFilterId)
+        ) {
+          setMessages((prev) => [response.data, ...prev]);
+        }
+      });
+      subscribeToCommentHub((response) => {
+        setMessages((prev) => {
+          const prevCopied = [...prev];
+          const messageIndex = prevCopied.findIndex(
+            (m) => m.id == response.messageId
+          );
+          prevCopied[messageIndex].comments = [
+            ...prevCopied[messageIndex].comments,
+            response,
+          ];
 
-            return prevCopied;
-          });
+          return prevCopied;
         });
       });
+    });
   }, [setMessages, studentFilterId]);
 
   useEffect(() => {

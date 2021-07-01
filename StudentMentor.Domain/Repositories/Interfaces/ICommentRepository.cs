@@ -6,6 +6,6 @@ namespace StudentMentor.Domain.Repositories.Interfaces
 {
     public interface ICommentRepository
     {
-        Task<ResponseResult<CommentModel>> Add(CreateCommentModel model);
+        Task<ResponseResult<CommentModel>> Add(CreateCommentModel model, int? userId = null);
     }
 }

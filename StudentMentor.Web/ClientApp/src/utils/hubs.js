@@ -1,16 +1,24 @@
-import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const connection = new HubConnectionBuilder()
   .withUrl("/MessagesHub", {
     accessTokenFactory: () => localStorage.getItem("token"),
   })
-  .configureLogging(LogLevel.Debug)
   .withAutomaticReconnect()
   .build();
 
+async function start() {
+  try {
+    await connection.start();
+  } catch (err) {
+    setTimeout(start, 5000);
+  }
+}
+
+connection.onclose(start);
+
 export const startMessageHubConnection = async () => {
-  await connection.stop();
-  await connection.start();
+  await start();
 };
 
 export const subscribeToMessageHub = (callback) => {

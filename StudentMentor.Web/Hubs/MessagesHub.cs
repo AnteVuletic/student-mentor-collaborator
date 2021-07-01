@@ -33,7 +33,8 @@ namespace StudentMentor.Web.Hubs
         public async Task SendComment(CreateCommentModel comment)
         {
             var userId = Context.UserIdentifier;
-            var commentResponse = await _commentRepository.Add(comment);
+            var userIdInt = int.Parse(userId);
+            var commentResponse = await _commentRepository.Add(comment, userIdInt);
             if (commentResponse.IsError)
                 return;
 

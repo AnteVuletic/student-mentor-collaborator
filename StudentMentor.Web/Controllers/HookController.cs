@@ -34,7 +34,7 @@ namespace StudentMentor.Web.Controllers
                 return NoContent();
 
             var message = messageResponse.Data;
-            await _hubContext.Clients.Users(message.UserTo.Id.ToString(), message.UserFrom.Id.ToString()).SendAsync(MessagesHub.SendMessageMethod, response.Data);
+            await _hubContext.Clients.Users(message.UserTo.Id.ToString(), message.UserFrom.Id.ToString()).SendAsync(MessagesHub.SendMessageMethod, messageResponse);
 
             return Ok();
         }
