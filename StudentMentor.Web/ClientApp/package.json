@@ -11,7 +11,7 @@
     "@microsoft/signalr": "^5.0.7",
     "axios": "^0.21.1",
     "dayjs": "^1.10.5",
-    "merge": "^1.2.1",
+    "merge": "^2.1.1",
     "oidc-client": "^1.9.0",
     "react": "^17.0.2",
     "react-doc-viewer": "^0.1.5",
