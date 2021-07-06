@@ -76,7 +76,7 @@ namespace StudentMentor.Domain.Mappings
                     ? new FileModel
                     {
                         FileName = x.File.FileName,
-                        Url = @$"{baseUrl}\{x.File.FilePath}",
+                        Url = @$"{baseUrl}/{x.File.FilePath.Replace('\\', '/')}",
                         Id = x.File.Id,
                     }
                     : null))
@@ -118,7 +118,7 @@ namespace StudentMentor.Domain.Mappings
             CreateMap<StudentFile, FileModelWithComments>()
                 .ForMember(m => m.FileName, opts => opts.MapFrom(src => src.File.FileName))
                 .ForMember(m => m.Id, opts => opts.MapFrom(src => src.File.Id))
-                .ForMember(m => m.Url, opts => opts.MapFrom(src => @$"{baseUrl}\{src.File.FilePath}"))
+                .ForMember(m => m.Url, opts => opts.MapFrom(src => @$"{baseUrl}/{src.File.FilePath.Replace('\\', '/')}"))
                 .ForMember(m => m.Comments, opts => opts.MapFrom(src => src.File.Message.Comments.Select(c =>
                     new CommentModel
                     {

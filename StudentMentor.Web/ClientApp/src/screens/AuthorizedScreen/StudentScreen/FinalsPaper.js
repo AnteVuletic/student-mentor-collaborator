@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import {
   Box,
@@ -16,8 +16,12 @@ import {
 
 import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
 import { useAvatarStyles } from "../../../theme/main";
+import { UserContext } from "../../../services/providers/UserProvider";
 
 const FinalsPaper = () => {
+  const {
+    state: { userId },
+  } = useContext(UserContext);
   const avatarStyle = useAvatarStyles();
   const [isLoading, setIsLoading] = useState(false);
   const [papers, setPapers] = useState(null);
@@ -129,7 +133,7 @@ const FinalsPaper = () => {
                             >
                               <Avatar
                                 className={
-                                  comment.userFrom.id === comment.userFrom.id
+                                  comment.userFrom.id === userId
                                     ? avatarStyle.avatarPrimary
                                     : avatarStyle.avatarSecondary
                                 }

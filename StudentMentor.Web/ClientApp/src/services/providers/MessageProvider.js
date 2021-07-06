@@ -47,7 +47,7 @@ const MessageProvider = ({ children }) => {
         setMessages((prev) => {
           const prevCopied = [...prev];
           const messageIndex = prevCopied.findIndex(
-            (m) => m.id == response.messageId
+            (m) => m.id === +response.messageId
           );
           prevCopied[messageIndex].comments = [
             ...prevCopied[messageIndex].comments,

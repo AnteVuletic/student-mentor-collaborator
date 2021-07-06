@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import {
   LinearProgress,
@@ -26,8 +26,12 @@ import {
 import { Close } from "@material-ui/icons";
 import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
 import { useAvatarStyles, useNavigationStyles } from "../../../theme/main";
+import { UserContext } from "../../../services/providers/UserProvider";
 
 const Students = () => {
+  const {
+    state: { userId },
+  } = useContext(UserContext);
   const avatarStyle = useAvatarStyles();
   const [isLoading, setIsLoading] = useState(true);
   const [students, setStudents] = useState([]);
@@ -215,7 +219,7 @@ const Students = () => {
                                             <Avatar
                                               className={
                                                 comment.userFrom.id ===
-                                                comment.userFrom.id
+                                                userId
                                                   ? avatarStyle.avatarPrimary
                                                   : avatarStyle.avatarSecondary
                                               }

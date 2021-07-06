@@ -270,7 +270,7 @@ const Message = ({ message }) => {
                       >
                         <Avatar
                           className={
-                            comment.userFrom.id === comment.userFrom.id
+                            comment.userFrom.id === userId
                               ? avatarStyle.avatarPrimary
                               : avatarStyle.avatarSecondary
                           }
