@@ -19,20 +19,20 @@ namespace StudentMentor.Web.Controllers
             _studentRepository = studentRepository;
         }
 
-[HttpGet(nameof(GetAllRepositories))]
-public async Task<ActionResult> GetAllRepositories()
-{
-    var response = await _githubService.GetAvailableRepositories();
-    if (response.IsError)
-        return BadRequest(response.Message);
+        [HttpGet(nameof(GetAllRepositories))]
+        public async Task<ActionResult> GetAllRepositories()
+        {
+            var response = await _githubService.GetAvailableRepositories();
+            if (response.IsError)
+                return BadRequest(response.Message);
 
-    var repositoryId = await _studentRepository.GetRepositoryId();
+            var repositoryId = await _studentRepository.GetRepositoryId();
 
-    return Ok(new
-    {
-        repositoryId = repositoryId,
-        repositories = response.Data
-    });
-}
+            return Ok(new
+            {
+                repositoryId = repositoryId,
+                repositories = response.Data
+            });
+        }
     }
 }

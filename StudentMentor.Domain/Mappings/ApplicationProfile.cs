@@ -68,7 +68,7 @@ namespace StudentMentor.Domain.Mappings
                         FileLogs = c.FileLogs.Select(fl => new GithubMessageFileLogModel
                         {
                             Id = fl.Id,
-                            ChangeType = fl.ChangeType,
+                            ChangeType = fl.ChangeType.ToString(),
                             File = fl.File
                         }).ToList()
                     })))

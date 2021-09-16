@@ -31,7 +31,7 @@ namespace StudentMentor.Domain.Models.ViewModels
     {
         public int Id { get; set; }
         public string File { get; set; }
-        public FileChangeType ChangeType { get; set; }
+        public string ChangeType { get; set; }
     }
 
     public class FileModel
