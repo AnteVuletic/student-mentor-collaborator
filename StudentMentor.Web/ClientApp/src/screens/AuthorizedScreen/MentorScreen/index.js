@@ -5,29 +5,13 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import MessageWall from "./MessageWall";
 import MessageProvider from "../../../services/providers/MessageProvider";
 import Students from "./Students";
-
-const baseUrl = "/home/mentor";
-const mentorMenuTabs = {
-  messages: "Messages",
-  students: "Students",
-  messagesRoute: `${baseUrl}/messages`,
-  studentsRoute: `${baseUrl}/students`,
-};
+import { mentorMenuTabs, navigation } from "../../../utils/Navigation";
 
 const MentorScreen = () => {
   const { setNavigationLinks } = useContext(MenuContext);
 
   useEffect(() => {
-    setNavigationLinks([
-      {
-        label: mentorMenuTabs.messages,
-        path: mentorMenuTabs.messagesRoute,
-      },
-      {
-        label: mentorMenuTabs.students,
-        path: mentorMenuTabs.studentsRoute,
-      },
-    ]);
+    setNavigationLinks(navigation.mentor);
   }, [setNavigationLinks]);
 
   return (

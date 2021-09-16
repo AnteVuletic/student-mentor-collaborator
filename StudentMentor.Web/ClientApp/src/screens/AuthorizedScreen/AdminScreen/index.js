@@ -6,29 +6,13 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import { MenuContext } from "../../../services/providers/MenuProvider";
 import InviteMentor from "./InviteMentor";
 import EditStudent from "./EditStudent";
-
-const baseUrl = "/home/admin";
-const adminScreenTabs = {
-  students: "Students",
-  mentors: "Mentors",
-  studentRoute: `${baseUrl}/students`,
-  mentorsRoute: `${baseUrl}/mentors`,
-};
+import { adminScreenTabs, navigation } from "../../../utils/Navigation";
 
 const AdminScreen = () => {
   const { setNavigationLinks } = useContext(MenuContext);
 
   useEffect(() => {
-    setNavigationLinks([
-      {
-        label: adminScreenTabs.students,
-        path: adminScreenTabs.studentRoute,
-      },
-      {
-        label: adminScreenTabs.mentors,
-        path: adminScreenTabs.mentorsRoute,
-      },
-    ]);
+    setNavigationLinks(navigation.admin);
   }, [setNavigationLinks]);
 
   return (

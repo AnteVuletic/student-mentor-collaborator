@@ -14,6 +14,9 @@ namespace StudentMentor.Data.Configurations
                 .HasValue<Student>(UserRole.Student)
                 .HasValue<Mentor>(UserRole.Mentor)
                 .HasValue<Admin>(UserRole.Admin);
+
+            builder.HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }

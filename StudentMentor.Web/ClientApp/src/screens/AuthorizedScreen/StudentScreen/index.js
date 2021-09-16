@@ -5,29 +5,13 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import MessageWall from "./MessageWall";
 import FinalsPaper from "./FinalsPaper";
 import MessageProvider from "../../../services/providers/MessageProvider";
-
-const baseUrl = "/home/student";
-const studentMenuTabs = {
-  messages: "Messages",
-  messagesRoute: `${baseUrl}/messages`,
-  finalsPaper: "Finals paper",
-  finalsPaperRoute: `${baseUrl}/finals-paper`,
-};
+import { navigation, studentMenuTabs } from "../../../utils/Navigation";
 
 const StudentScreen = () => {
   const { setNavigationLinks } = useContext(MenuContext);
 
   useEffect(() => {
-    setNavigationLinks([
-      {
-        label: studentMenuTabs.messages,
-        path: studentMenuTabs.messagesRoute,
-      },
-      {
-        label: studentMenuTabs.finalsPaper,
-        path: studentMenuTabs.finalsPaperRoute,
-      },
-    ]);
+    setNavigationLinks(navigation.student);
   }, [setNavigationLinks]);
 
   return (

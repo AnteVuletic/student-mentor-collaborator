@@ -165,7 +165,7 @@ namespace StudentMentor.Domain.Repositories.Implementations
         {
             var students = await _dbContext
                 .Students
-                .Where(s => s.MentorId == mentorId || !s.MentorId.HasValue)
+                .Where(s => s.MentorId == mentorId)
                 .ProjectTo<StudentModel>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
